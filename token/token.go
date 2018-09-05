@@ -8,12 +8,13 @@ const (
 	INT    = "INT"
 	STRING = "STRING"
 
-	ASSIGN   = "="
-	PLUS     = "+"
-	MINUS    = "-"
-	BANG     = "!"
-	ASTERISK = "*"
-	SLASH    = "/"
+	ASSIGN      = "="
+	DECLARATION = ":="
+	PLUS        = "+"
+	MINUS       = "-"
+	BANG        = "!"
+	ASTERISK    = "*"
+	SLASH       = "/"
 
 	LT = "<"
 	GT = ">"
@@ -55,6 +56,7 @@ var keywords = map[string]TokenType{
 	"if":     IF,
 	"else":   ELSE,
 	"return": RETURN,
+	":=":     DECLARATION,
 }
 
 func LookupIdent(ident string) TokenType {
