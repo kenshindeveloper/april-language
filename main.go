@@ -5,12 +5,13 @@ import (
 	"os"
 	"os/user"
 
+	"github.com/kenshindeveloper/april/file"
 	"github.com/kenshindeveloper/april/repl"
 )
 
-const MAJOR int = 0
-const MINOR int = 0
-const MICRO int = 0
+const major int = 0
+const minor int = 0
+const micro int = 0
 
 func main() {
 
@@ -19,6 +20,15 @@ func main() {
 		panic(err)
 	}
 
-	fmt.Printf("April interpreter version: %d.%d.%d-alpha %s\n", MAJOR, MINOR, MICRO, user.Username)
-	repl.Start(os.Stdin, os.Stdout)
+	switch len(os.Args) {
+	case 1:
+		//REPL (bucle lectura-evaluacion-impresion)
+		fmt.Printf("April interpreter version: %d.%d.%d-alpha %s\n", major, minor, micro, user.Username)
+		repl.Start(os.Stdin, os.Stdout)
+	case 2:
+		fmt.Printf("April interpreter version: %d.%d.%d-alpha %s\n\n", major, minor, micro, user.Username)
+		file.Start(os.Args[1])
+	default:
+		fmt.Println("incorrect number of parametres")
+	}
 }
