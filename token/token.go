@@ -15,12 +15,13 @@ const (
 	BANG        = "!"
 	ASTERISK    = "*"
 	SLASH       = "/"
+	MOD         = "%"
 
 	LT = "<"
 	GT = ">"
 
-	EQ     = "=="
-	NOT_EQ = "!="
+	EQUAL     = "=="
+	NOT_EQUAL = "!="
 
 	COMMA     = ","
 	SEMICOLON = ";"

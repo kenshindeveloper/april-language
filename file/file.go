@@ -19,12 +19,12 @@ func Start(name string) bool {
 	}
 
 	scanner := bufio.NewScanner(file)
-	// scanner.Split(bufio.ScanWords)
 
-	buffersize := 10
+	buffersize := 1
 	words := make([]string, buffersize)
 	index := 0
 	existerr := false
+	text := ""
 
 	for scanner.Scan() {
 		if err := scanner.Err(); err != nil {
@@ -32,8 +32,11 @@ func Start(name string) bool {
 			break
 		}
 
-		words[index] = scanner.Text()
-		index++
+		text = scanner.Text()
+		if len(text) > 0 {
+			words[index] = text
+			index++
+		}
 
 		if index >= len(words) {
 			auxwords := make([]string, buffersize)
@@ -47,16 +50,17 @@ func Start(name string) bool {
 	}
 
 	for _, line := range words {
-		fmt.Println(line)
+		fmt.Printf("%s\n", line)
 	}
 
 	if len(words) > 0 {
-		l := lexer.New(words[0])
 		fmt.Printf("-----------------------------------\n")
-		for tok := l.NextToken(); tok.Type != token.EOF; tok = l.NextToken() {
-			fmt.Printf("%+v\n", tok)
+		for _, line := range words {
+			l := lexer.New(line)
+			for tok := l.NextToken(); tok.Type != token.EOF; tok = l.NextToken() {
+				fmt.Printf("%+v\n", tok)
+			}
 		}
-
 		fmt.Printf("-----------------------------------\n")
 	}
 
