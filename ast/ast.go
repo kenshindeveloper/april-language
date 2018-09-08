@@ -1,9 +1,14 @@
 package ast
 
-import "github.com/kenshindeveloper/april/token"
+import (
+	"bytes"
+
+	"github.com/kenshindeveloper/april/token"
+)
 
 type Node interface {
 	TokenLiteral() string //su uso es solo de prueba..
+	String() string
 }
 
 type Statement interface {
@@ -15,6 +20,10 @@ type Expression interface {
 	Node
 	expressionNode()
 }
+
+//***************************************************************************************
+//***************************************************************************************
+//***************************************************************************************
 
 type Program struct {
 	Statements []Statement
@@ -28,6 +37,20 @@ func (p *Program) TokenLiteral() string {
 	}
 }
 
+func (p *Program) String() string {
+	var out bytes.Buffer
+
+	for _, s := range p.Statements {
+		out.WriteString(s.String())
+	}
+
+	return out.String()
+}
+
+//***************************************************************************************
+//***************************************************************************************
+//***************************************************************************************
+
 //Identifier es una
 type Identifier struct {
 	Token token.Token
@@ -40,17 +63,91 @@ func (ident *Identifier) TokenLiteral() string {
 	return ident.Token.Literal
 }
 
-//!Estructura Identifier
-
-//VarStatement es una estructura contenedora de la declaracion var ejemplo:var x int = 15;
-type VarStatement struct {
-	Token token.Token
-	Name  *Identifier
-	Value Expression
+func (ident *Identifier) String() string {
+	return ident.Value
 }
 
-func (ls *VarStatement) statementNode() {}
+//***************************************************************************************
+//***************************************************************************************
+//***************************************************************************************
 
-func (ls *VarStatement) TokenLiteral() string {
-	return ls.Token.Literal
+//VarStatement es una estructura contenedora ejemplo:var x int = 15;
+//OJO: falta declarar el attr de -> Type <-
+type VarStatement struct {
+	Token token.Token //var
+	Name  *Identifier //x
+	Value Expression  //15
+}
+
+func (varStmt *VarStatement) statementNode() {}
+
+func (varStmt *VarStatement) TokenLiteral() string {
+	return varStmt.Token.Literal
+}
+
+func (varStmt *VarStatement) String() string {
+	var out bytes.Buffer
+
+	out.WriteString(varStmt.TokenLiteral() + " ")
+	out.WriteString(varStmt.Name.String())
+	out.WriteString(" = ")
+
+	if varStmt.Value != nil {
+		out.WriteString(varStmt.Value.String())
+	}
+
+	out.WriteString(";")
+
+	return out.String()
+}
+
+//***************************************************************************************
+//***************************************************************************************
+//***************************************************************************************
+
+//ReturnStatement es una estructura que almacena un Statement
+type ReturnStatement struct {
+	Token       token.Token
+	ReturnValue Expression
+}
+
+func (r *ReturnStatement) statementNode() {}
+
+func (r *ReturnStatement) TokenLiteral() string {
+	return r.Token.Literal
+}
+
+func (r *ReturnStatement) String() string {
+	var out bytes.Buffer
+
+	out.WriteString(r.TokenLiteral() + " ")
+
+	if r.ReturnValue != nil {
+		out.WriteString(r.ReturnValue.String())
+	}
+
+	out.WriteString(";")
+	return out.String()
+}
+
+//***************************************************************************************
+//***************************************************************************************
+//***************************************************************************************
+
+type ExpressionStatement struct {
+	Token      token.Token //El primer token de la expression
+	Expression Expression
+}
+
+func (expreStmt *ExpressionStatement) statementNode() {}
+
+func (exprStmt *ExpressionStatement) TokenLiteral() string {
+	return exprStmt.Token.Literal
+}
+
+func (exprStmt *ExpressionStatement) String() string {
+	if exprStmt.Expression != nil {
+		return exprStmt.Expression.String()
+	}
+	return ""
 }

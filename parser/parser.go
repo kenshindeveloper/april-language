@@ -58,9 +58,24 @@ func (p *Parser) parseStatement() ast.Statement {
 	switch p.curToken.Type {
 	case token.VAR:
 		return p.parseVarStatement()
+
+	case token.RETURN:
+		return p.parseReturnStatement()
+
 	default:
 		return nil
 	}
+}
+
+func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
+	stmt := &ast.ReturnStatement{Token: p.curToken}
+	p.nextToken()
+
+	for !p.curTokenIs(token.SEMICOLON) { //NOOOOOOOO REVISA ESTO
+		p.nextToken()
+	}
+
+	return stmt
 }
 
 func (p *Parser) parseVarStatement() *ast.VarStatement {
