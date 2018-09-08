@@ -28,7 +28,7 @@ func (p *Program) TokenLiteral() string {
 	}
 }
 
-//Estructura Identifier
+//Identifier es una
 type Identifier struct {
 	Token token.Token
 	Value string
@@ -40,16 +40,17 @@ func (ident *Identifier) TokenLiteral() string {
 	return ident.Token.Literal
 }
 
-//Estructura Identifier
+//!Estructura Identifier
 
-type LetStatement struct {
+//VarStatement es una estructura contenedora de la declaracion var ejemplo:var x int = 15;
+type VarStatement struct {
 	Token token.Token
 	Name  *Identifier
 	Value Expression
 }
 
-func (ls *LetStatement) statementNode() {}
+func (ls *VarStatement) statementNode() {}
 
-func (ls *LetStatement) TokenLiteral() string {
+func (ls *VarStatement) TokenLiteral() string {
 	return ls.Token.Literal
 }

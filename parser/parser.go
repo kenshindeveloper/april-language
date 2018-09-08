@@ -1,6 +1,8 @@
 package parser
 
 import (
+	"fmt"
+
 	"github.com/kenshindeveloper/april/ast"
 	"github.com/kenshindeveloper/april/lexer"
 	"github.com/kenshindeveloper/april/token"
@@ -11,10 +13,11 @@ type Parser struct {
 
 	curToken  token.Token
 	peekToken token.Token
+	errors    []string
 }
 
 func New(l *lexer.Lexer) *Parser {
-	p := &Parser{l: l}
+	p := &Parser{l: l, errors: []string{}}
 	//Lee dos tokens, para establecer a curToken & peekToken
 	p.nextToken()
 	p.nextToken()
@@ -22,8 +25,17 @@ func New(l *lexer.Lexer) *Parser {
 	return p
 }
 
+func (p *Parser) Error() []string {
+	return p.errors
+}
+
+func (p *Parser) peekError(t token.TokenType) {
+	msg := fmt.Sprintf("expected next token to be %s, got %s instead", t, p.curToken.Literal)
+	p.errors = append(p.errors, msg)
+}
+
 func (p *Parser) nextToken() {
-	p.curToken = p.peekToken
+	p.curToken = p.peekToken //current token
 	p.peekToken = p.l.NextToken()
 }
 
@@ -45,20 +57,25 @@ func (p *Parser) ParserProgram() *ast.Program {
 func (p *Parser) parseStatement() ast.Statement {
 	switch p.curToken.Type {
 	case token.VAR:
-		return p.parseLetStatement()
+		return p.parseVarStatement()
 	default:
 		return nil
 	}
 }
 
-func (p *Parser) parseLetStatement() *ast.LetStatement {
-	stmt := &ast.LetStatement{Token: p.curToken}
+func (p *Parser) parseVarStatement() *ast.VarStatement {
+	stmt := &ast.VarStatement{Token: p.curToken}
 
 	if !p.expectPeek(token.IDENT) {
 		return nil
 	}
 
 	stmt.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
+
+	//se debe agregar la compracion de los diferentes tipos de datos
+	if !p.expectPeek(token.INT) {
+		return nil
+	}
 
 	if !p.expectPeek(token.ASSIGN) {
 		return nil
@@ -67,6 +84,7 @@ func (p *Parser) parseLetStatement() *ast.LetStatement {
 	for !p.curTokenIs(token.SEMICOLON) {
 		p.nextToken()
 	}
+
 	return stmt
 }
 
@@ -83,6 +101,7 @@ func (p *Parser) expectPeek(t token.TokenType) bool {
 		p.nextToken()
 		return true
 	} else {
+		p.peekError(t)
 		return false
 	}
 }

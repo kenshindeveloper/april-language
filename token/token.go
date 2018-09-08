@@ -58,6 +58,7 @@ var keywords = map[string]TokenType{
 	"else":   ELSE,
 	"return": RETURN,
 	":=":     DECLARATION,
+	"int":    INT,
 }
 
 func LookupIdent(ident string) TokenType {

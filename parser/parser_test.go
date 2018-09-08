@@ -7,16 +7,17 @@ import (
 	"github.com/kenshindeveloper/april/lexer"
 )
 
-func TestLetStatements(t *testing.T) {
+func TestVarStatements(t *testing.T) {
 	input := `
-		var x = 5;
-		var y = 10;
-		var foobar = 838383;
+		var x int = 5;
+		var y int = 10;
+		var foobar int = 838383;
 	`
 	l := lexer.New(input)
 	p := New(l)
 
 	program := p.ParserProgram()
+	checkParserErrors(t, p)
 	if program == nil {
 		t.Fatalf("ParserProgram() return nil")
 	}
@@ -37,32 +38,45 @@ func TestLetStatements(t *testing.T) {
 
 		stmt := program.Statements[i]
 
-		if !testLetStatement(t, stmt, tt.expectedIdentifier) {
+		if !testVarStatement(t, stmt, tt.expectedIdentifier) {
 			return
 		}
 	}
 }
 
-func testLetStatement(t *testing.T, stmt ast.Statement, name string) bool {
+func checkParserErrors(t *testing.T, p *Parser) {
+	errors := p.errors
+	if len(errors) == 0 {
+		return
+	}
+
+	t.Errorf("parser has %d errors", len(errors))
+	for _, msg := range errors {
+		t.Errorf("parser error: %q", msg)
+	}
+	t.FailNow()
+}
+
+func testVarStatement(t *testing.T, stmt ast.Statement, name string) bool {
 
 	if stmt.TokenLiteral() != "var" {
 		t.Errorf("stmt.TokenLiteral not 'var'. got=%q", stmt.TokenLiteral())
 		return false
 	}
 
-	letStmt, ok := stmt.(*ast.LetStatement) //no se que significa esta instruccion
+	varStmt, ok := stmt.(*ast.VarStatement) //no se que significa esta instruccion
 	if !ok {
 		t.Errorf("stmt not *ast.LetStatement. got=%T", stmt)
 		return false
 	}
 
-	if letStmt.Name.Value != name {
-		t.Errorf("letStmt.Name.Value not '%s'. got=%s", name, letStmt.Name.Value)
+	if varStmt.Name.Value != name {
+		t.Errorf("varStmt.Name.Value not '%s'. got=%s", name, varStmt.Name.Value)
 		return false
 	}
 
-	if letStmt.Name.TokenLiteral() != name {
-		t.Errorf("letStmt.Name not '%s'. got=%s", name, letStmt.Name)
+	if varStmt.Name.TokenLiteral() != name {
+		t.Errorf("varStmt.Name not '%s'. got=%s", name, varStmt.Name)
 		return false
 	}
 
