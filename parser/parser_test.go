@@ -1,11 +1,123 @@
 package parser
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/kenshindeveloper/april/ast"
 	"github.com/kenshindeveloper/april/lexer"
 )
+
+func TestParsingInfixExpressions(t *testing.T) {
+	infixTest := []struct {
+		input      string
+		leftValue  int64
+		operator   string
+		rightValue int64
+	}{
+		{"5 + 5;", 5, "+", 5},
+		{"5 - 5;", 5, "-", 5},
+		{"5 * 5;", 5, "*", 5},
+		{"5 / 5;", 5, "/", 5},
+		{"5 > 5;", 5, ">", 5},
+		{"5 < 5;", 5, "<", 5},
+		{"5 == 5;", 5, "==", 5},
+		{"5 != 5;", 5, "!=", 5},
+	}
+
+	for _, tt := range infixTest {
+		l := lexer.New(tt.input)
+		p := New(l)
+		program := p.ParserProgram()
+		checkParserErrors(t, p)
+
+		if len(program.Statements) != 1 {
+			t.Fatalf("program.Statemets does not containt %d statemets. got=%d", 1, len(program.Statements))
+		}
+
+		stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+		if !ok {
+			t.Fatalf("program.Statements[0] is not *ast.ExpressionStatement. got=%T", program.Statements[0])
+		}
+
+		expr, ok := stmt.Expression.(*ast.InfixExpression)
+		if !ok {
+			t.Fatalf("stmts is not *ast.InfixExpression. got=%T", stmt.Expression)
+		}
+
+		if !testIntegerLiteral(t, expr.Left, tt.leftValue) {
+			return
+		}
+
+		if expr.Operator != tt.operator {
+			t.Fatalf("expr.Operator is not %s. got=%s", tt.operator, expr.Operator)
+		}
+
+		if !testIntegerLiteral(t, expr.Right, tt.rightValue) {
+			return
+		}
+	}
+}
+
+func TestPasingPrefixExpressions(t *testing.T) {
+	preFixTest := []struct {
+		input        string
+		operator     string
+		integerValue int64
+	}{
+		{"!5;", "!", 5},
+		{"-15;", "-", 15},
+	}
+
+	for _, tt := range preFixTest {
+		l := lexer.New(tt.input)
+		p := New(l)
+		program := p.ParserProgram()
+		checkParserErrors(t, p)
+
+		if len(program.Statements) != 1 {
+			t.Fatalf("program.Statement does not containt %d statemets. got %d", 1, len(program.Statements))
+		}
+
+		stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+		if !ok {
+			t.Fatalf("program.Statements[0] is not ast.ExpressionStatement. got=%T", program.Statements[0])
+		}
+
+		expr, ok := stmt.Expression.(*ast.PrefixExpression)
+		if !ok {
+			t.Fatalf("stmts is not ast.PrefixExpression. got=%T", stmt.Expression)
+		}
+
+		if expr.Operator != tt.operator {
+			t.Fatalf("expr.Operator is not equal tt.operador %s. got=%s", tt.operator, expr.Operator)
+		}
+
+		if !testIntegerLiteral(t, expr.Right, tt.integerValue) {
+			return
+		}
+	}
+}
+
+func testIntegerLiteral(t *testing.T, i ast.Expression, value int64) bool {
+	interg, ok := i.(*ast.IntegerLiteral)
+	if !ok {
+		t.Errorf("i not *ast.IntegerLiteral. got=%T", i)
+		return false
+	}
+
+	if interg.Value != value {
+		t.Errorf("i.Value is not %d. got=%d", value, interg.Value)
+		return false
+	}
+
+	if interg.TokenLiteral() != fmt.Sprintf("%d", value) {
+		t.Errorf("i.TokenLiteral is not %d. got=%s", value, interg.TokenLiteral())
+		return false
+	}
+
+	return true
+}
 
 func TestIntegerLiteralExpression(t *testing.T) {
 	input := `5;`
