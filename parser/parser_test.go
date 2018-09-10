@@ -8,6 +8,111 @@ import (
 	"github.com/kenshindeveloper/april/lexer"
 )
 
+func TestCallExpressionParsing(t *testing.T) {
+	input := `add(1, 2 * 3, 4 + 5);`
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParserProgram()
+	checkParserErrors(t, p)
+
+	if len(program.Statements) != 1 {
+		t.Fatalf("program.Statements does not containt %d. got=%d", 1, len(program.Statements))
+	}
+
+	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("program.Statements[0] is not *ast.ExpressionStatement. got=%T", program.Statements[0])
+	}
+
+	expr, ok := stmt.Expression.(*ast.CallExpression)
+	if !ok {
+		t.Fatalf("stmt.Expression is not *ast.CallExpression. got=%T", stmt.Expression)
+	}
+
+	if !testIdentifier(t, expr.Function, "add") {
+		return
+	}
+
+	if len(expr.Arguments) != 3 {
+		t.Fatalf("wrong length of arguments. got=%d", len(expr.Arguments))
+	}
+
+	testLiteralExpression(t, expr.Arguments[0], 1)
+	testInfixExpression(t, expr.Arguments[1], 2, "*", 3)
+	testInfixExpression(t, expr.Arguments[2], 4, "+", 5)
+}
+
+func TestFunctionParameterParsing(t *testing.T) {
+	tests := []struct {
+		input          string
+		expectedParams []string
+	}{
+		{input: "fn() {};", expectedParams: []string{}},
+		{input: "fn(x) {};", expectedParams: []string{"x"}},
+		{input: "fn(x, y, z) {};", expectedParams: []string{"x", "y", "z"}},
+	}
+
+	for _, tt := range tests {
+		l := lexer.New(tt.input)
+		p := New(l)
+		program := p.ParserProgram()
+		checkParserErrors(t, p)
+
+		stmt := program.Statements[0].(*ast.ExpressionStatement)
+		function := stmt.Expression.(*ast.FunctionLiteral)
+
+		if len(function.Parameters) != len(tt.expectedParams) {
+			t.Errorf("length parameters wrong. want %d, got=%d", len(tt.expectedParams), len(function.Parameters))
+		}
+
+		for i, ident := range tt.expectedParams {
+			testLiteralExpression(t, function.Parameters[i], ident)
+		}
+	}
+}
+
+// func TestFunctionLiteralParsing(t *testing.T) {
+// 	input := `fn (x, y) { return x + y; }`
+
+// 	l := lexer.New(input)
+// 	p := New(l)
+// 	program := p.ParserProgram()
+// 	checkParserErrors(t, p)
+
+// 	if len(program.Statements) != 1 {
+// 		t.Fatalf("program.Statements does not containt %d. got=%d", 1, len(program.Statements))
+// 	}
+
+// 	stmt, ok := program.Statements[0].(*ast.ExpressionStatement)
+// 	if !ok {
+// 		t.Fatalf("program.Statements[0] is not *ast.ExpressionStatement. got=%T", program.Statements[0])
+// 	}
+
+// 	function, ok := stmt.Expression.(*ast.FunctionLiteral)
+// 	if !ok {
+// 		t.Fatalf("stmt.Expression is not *ast.FunctionLiteral. got=%T", stmt.Expression)
+// 	}
+
+// 	if len(function.Parameters) != 2 {
+// 		t.Fatalf("function.Parameter wrong. want %d. got=%d", 2, len(function.Parameters))
+// 	}
+
+// 	testLiteralExpression(t, function.Parameters[0], "x")
+// 	testLiteralExpression(t, function.Parameters[1], "y")
+
+// 	if len(function.Body.Statements) != 1 {
+// 		t.Fatalf("function.Body.Statements has not %d statements. got=%d", 1, len(function.Body.Statements))
+// 	}
+
+// 	bodyStmt, ok := function.Body.Statements[0].(*ast.ExpressionStatement)
+// 	if !ok {
+// 		t.Fatalf("function.Body.Statements[0] is not *ast.ExpressionStatement. got=%T", function.Body.Statements[0])
+// 	}
+
+// 	testInfixExpression(t, bodyStmt.Expression, "x", "+", "y")
+// }
+
 func TestIfExpression(t *testing.T) {
 	input := `if (x < y) { x }`
 
@@ -80,6 +185,10 @@ func TestOperatorPrecedenceParsing(t *testing.T) {
 		{"2 / (5 + 5)", "(2 / (5 + 5))"},
 		{"-(5 + 5)", "(-(5 + 5))"},
 		{"!(true == true)", "(!(true == true))"},
+
+		{"a + add(b * c) + d", "((a + add((b * c))) + d)"},
+		{"add(a, b, 1, 2 * 3, 4 + 5, add(6, 7 * 8))", "add(a, b, 1, (2 * 3), (4 + 5), add(6, (7 * 8)))"},
+		{"add(a + b + c * d / f + g)", "add((((a + b) + ((c * d) / f)) + g))"},
 	}
 
 	for _, tt := range tests {
