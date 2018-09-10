@@ -348,9 +348,9 @@ func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
 	stmt := &ast.ReturnStatement{Token: p.curToken}
 	p.nextToken()
 
-	// stmt.ReturnValue = p.parseExpression(LOWEST)
+	stmt.ReturnValue = p.parseExpression(LOWEST)
 
-	for !p.curTokenIs(token.SEMICOLON) { //NOOOOOOOO REVISA ESTO
+	if !p.curTokenIs(token.SEMICOLON) {
 		p.nextToken()
 	}
 
@@ -365,8 +365,7 @@ func (p *Parser) parseVarStatement() *ast.VarStatement {
 	}
 
 	stmt.Name = &ast.Identifier{Token: p.curToken, Value: p.curToken.Literal}
-	//x
-	//se debe agregar la compracion de los diferentes tipos de datos
+
 	if !p.expectPeek(token.INT) {
 		return nil
 	}
@@ -375,10 +374,10 @@ func (p *Parser) parseVarStatement() *ast.VarStatement {
 		return nil
 	}
 
-	// p.nextToken()
-	// stmt.Value = p.parseExpression(LOWEST)
+	p.nextToken()
+	stmt.Value = p.parseExpression(LOWEST)
 
-	for !p.curTokenIs(token.SEMICOLON) {
+	if !p.curTokenIs(token.SEMICOLON) {
 		p.nextToken()
 	}
 
