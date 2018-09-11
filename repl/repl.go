@@ -6,10 +6,19 @@ import (
 	"io"
 
 	"github.com/kenshindeveloper/april/lexer"
-	"github.com/kenshindeveloper/april/token"
+	"github.com/kenshindeveloper/april/parser"
 )
 
 const PROMPT string = ">> "
+
+const APRIL_LOGO = `
+               _ _ _     
+             /        \
+      (\/)  <  ERROR!  
+      ( . .) \ _ _  _ /
+ __\/_C(")(")__\/___\//____
+
+`
 
 func Start(in io.Reader, out io.Writer) {
 	scanner := bufio.NewScanner(in)
@@ -23,9 +32,24 @@ func Start(in io.Reader, out io.Writer) {
 
 		line := scanner.Text()
 		l := lexer.New(line)
+		p := parser.New(l)
+		program := p.ParserProgram()
 
-		for tok := l.NextToken(); tok.Type != token.EOF; tok = l.NextToken() {
-			fmt.Printf("%+v\n", tok)
+		if len(p.Error()) != 0 {
+			printParserErrors(out, p.Error())
+			continue
 		}
+
+		io.WriteString(out, program.String())
+		io.WriteString(out, "\n")
+
+	}
+}
+
+func printParserErrors(out io.Writer, errors []string) {
+	io.WriteString(out, APRIL_LOGO)
+	io.WriteString(out, "Shit! exist errors:")
+	for _, msg := range errors {
+		io.WriteString(out, "\t"+msg+"\n")
 	}
 }

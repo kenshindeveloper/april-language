@@ -105,6 +105,7 @@ func TestFunctionParameterParsing(t *testing.T) {
 // 		t.Fatalf("function.Body.Statements has not %d statements. got=%d", 1, len(function.Body.Statements))
 // 	}
 
+// 	// bodyStmt, ok := function.Body.Statements[0].(*ast.ExpressionStatement)
 // 	bodyStmt, ok := function.Body.Statements[0].(*ast.ExpressionStatement)
 // 	if !ok {
 // 		t.Fatalf("function.Body.Statements[0] is not *ast.ExpressionStatement. got=%T", function.Body.Statements[0])
