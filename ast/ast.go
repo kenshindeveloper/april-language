@@ -140,15 +140,15 @@ type ExpressionStatement struct {
 	Expression Expression
 }
 
-func (expreStmt *ExpressionStatement) statementNode() {}
+func (es *ExpressionStatement) statementNode() {}
 
-func (exprStmt *ExpressionStatement) TokenLiteral() string {
-	return exprStmt.Token.Literal
+func (es *ExpressionStatement) TokenLiteral() string {
+	return es.Token.Literal
 }
 
-func (exprStmt *ExpressionStatement) String() string {
-	if exprStmt.Expression != nil {
-		return exprStmt.Expression.String()
+func (es *ExpressionStatement) String() string {
+	if es.Expression != nil {
+		return es.Expression.String()
 	}
 	return ""
 }

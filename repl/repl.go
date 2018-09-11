@@ -48,8 +48,12 @@ func Start(in io.Reader, out io.Writer) {
 
 func printParserErrors(out io.Writer, errors []string) {
 	io.WriteString(out, APRIL_LOGO)
-	io.WriteString(out, "Shit! exist errors:\n")
-	for i, msg := range errors {
-		io.WriteString(out, "\t"+fmt.Sprintf("%d", i)+"- "+msg+"\n\n")
+	if len(errors) > 1 {
+		io.WriteString(out, "Shit! there are errors:\n")
+	} else if len(errors) == 1 {
+		io.WriteString(out, "Shit! there is a error:\n")
+	}
+	for _, msg := range errors {
+		io.WriteString(out, "\t- "+msg+"\n\n")
 	}
 }

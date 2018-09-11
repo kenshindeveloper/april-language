@@ -109,7 +109,6 @@ func (p *Parser) parseStatement() ast.Statement {
 
 func (p *Parser) parserExpressionStatement() *ast.ExpressionStatement {
 	stmt := &ast.ExpressionStatement{Token: p.curToken}
-
 	stmt.Expression = p.parseExpression(LOWEST)
 
 	if p.peekTokenIs(token.SEMICOLON) {
@@ -119,6 +118,7 @@ func (p *Parser) parserExpressionStatement() *ast.ExpressionStatement {
 	return stmt
 }
 
+// 5 + 2 * 6;
 func (p *Parser) parseExpression(precedence int) ast.Expression {
 	prefix := p.prefixParseFns[p.curToken.Type]
 	if prefix == nil {
@@ -175,7 +175,6 @@ func (p *Parser) parseInfixExpression(left ast.Expression) ast.Expression {
 		Operator: p.curToken.Literal,
 		Left:     left,
 	}
-
 	precedence := p.curPrecedence()
 	p.nextToken()
 	expr.Right = p.parseExpression(precedence)
@@ -404,7 +403,6 @@ func (p *Parser) expectPeek(t token.TokenType) bool {
 
 func (p *Parser) parseIntegerLiteral() ast.Expression {
 	i := &ast.IntegerLiteral{Token: p.curToken}
-
 	value, err := strconv.ParseInt(p.curToken.Literal, 0, 64)
 	if err != nil {
 		msg := fmt.Sprintf("could not parse %q as integer", p.curToken.Literal)
