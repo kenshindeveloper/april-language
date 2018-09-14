@@ -8,6 +8,22 @@ import (
 	"github.com/kenshindeveloper/april/parser"
 )
 
+func TestVarStatements(t *testing.T) {
+	tests := []struct {
+		input    string
+		expected int64
+	}{
+		{"var a int = 5; a;", 5},
+		{"var a int = 5 * 5; a;", 25},
+		{"var a int = 5 * 5; var b int = a; b;", 25},
+		{"var a int = 5; var b int = a; var c int = a + b + 5; c;", 15},
+	}
+
+	for _, tt := range tests {
+		testIntegerObject(t, testEval(tt.input), tt.expected)
+	}
+}
+
 func TestErrorHandling(t *testing.T) {
 	tests := []struct {
 		input           string
@@ -22,11 +38,12 @@ func TestErrorHandling(t *testing.T) {
 		{`
 			if (10 > 1) {
 				if (10 > 1) {
-					retur true + false;
+					return true + false;
 				}
 				return 1;
 			}
 		`, "unknown operator: BOOLEAN + BOOLEAN"},
+		{"foobar", "identifier not found: foobar"},
 	}
 
 	for _, tt := range tests {
@@ -203,8 +220,9 @@ func testEval(input string) object.Object {
 	l := lexer.New(input)
 	p := parser.New(l)
 	program := p.ParserProgram()
+	env := object.NewEnvironment()
 
-	return Eval(program)
+	return Eval(program, env)
 }
 
 func testIntegerObject(t *testing.T, obj object.Object, expected int64) bool {

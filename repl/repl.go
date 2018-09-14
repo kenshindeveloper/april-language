@@ -7,6 +7,7 @@ import (
 
 	"github.com/kenshindeveloper/april/evaluator"
 	"github.com/kenshindeveloper/april/lexer"
+	"github.com/kenshindeveloper/april/object"
 	"github.com/kenshindeveloper/april/parser"
 )
 
@@ -40,7 +41,8 @@ func Start(in io.Reader, out io.Writer) {
 			continue
 		}
 
-		evaluated := evaluator.Eval(program)
+		env := object.NewEnvironment()
+		evaluated := evaluator.Eval(program, env)
 		if evaluated != nil {
 			io.WriteString(out, evaluated.Inspect())
 			io.WriteString(out, "\n")
