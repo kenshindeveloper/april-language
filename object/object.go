@@ -55,10 +55,10 @@ func (b *Boolean) Type() ObjectType {
 
 type Null struct{}
 
-func (n *Null) Inspect() ObjectType {
+func (n *Null) Inspect() string {
 	return "null"
 }
 
-func (n *Null) Type() string {
+func (n *Null) Type() ObjectType {
 	return NULL_OBJ
 }

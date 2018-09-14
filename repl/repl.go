@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io"
 
+	"github.com/kenshindeveloper/april/evaluator"
 	"github.com/kenshindeveloper/april/lexer"
 	"github.com/kenshindeveloper/april/parser"
 )
@@ -34,14 +35,16 @@ func Start(in io.Reader, out io.Writer) {
 		l := lexer.New(line)
 		p := parser.New(l)
 		program := p.ParserProgram()
-
 		if len(p.Error()) != 0 {
 			printParserErrors(out, p.Error())
 			continue
 		}
 
-		io.WriteString(out, program.String())
-		io.WriteString(out, "\n")
+		evaluated := evaluator.Eval(program)
+		if evaluated != nil {
+			io.WriteString(out, evaluated.Inspect())
+			io.WriteString(out, "\n")
+		}
 
 	}
 }
