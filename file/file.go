@@ -1,67 +1,37 @@
 package file
 
 import (
-	"bufio"
-	"fmt"
-	"log"
+	"io"
+	"io/ioutil"
 	"os"
 
+	"github.com/kenshindeveloper/april/evaluator"
 	"github.com/kenshindeveloper/april/lexer"
-	"github.com/kenshindeveloper/april/token"
+	"github.com/kenshindeveloper/april/object"
+	"github.com/kenshindeveloper/april/parser"
+	"github.com/kenshindeveloper/april/repl"
 )
 
 func Start(name string) bool {
 
-	file, err := os.Open(name)
-	if err != nil {
-		log.Fatalf("file: %s not exist\n", name)
-		return false
+	file, _ := ioutil.ReadFile(name)
+
+	input := string(file)
+
+	// fmt.Println("------------------------------------")
+	// fmt.Println(input)
+	// fmt.Println("------------------------------------\n")
+
+	l := lexer.New(input)
+	p := parser.New(l)
+	program := p.ParserProgram()
+	if len(p.Error()) != 0 {
+		repl.PrintParserErrors(os.Stdout, p.Error())
 	}
-
-	scanner := bufio.NewScanner(file)
-
-	buffersize := 1
-	words := make([]string, buffersize)
-	index := 0
-	existerr := false
-	text := ""
-
-	for scanner.Scan() {
-		if err := scanner.Err(); err != nil {
-			existerr = true
-			break
-		}
-
-		text = scanner.Text()
-		if len(text) > 0 {
-			words[index] = text
-			index++
-		}
-
-		if index >= len(words) {
-			auxwords := make([]string, buffersize)
-			words = append(words, auxwords...)
-		}
-	}
-
-	if existerr {
-		log.Fatal("error reading the file")
-		return false
-	}
-
-	for _, line := range words {
-		fmt.Printf("%s\n", line)
-	}
-
-	if len(words) > 0 {
-		fmt.Printf("-----------------------------------\n")
-		for _, line := range words {
-			l := lexer.New(line)
-			for tok := l.NextToken(); tok.Type != token.EOF; tok = l.NextToken() {
-				fmt.Printf("%+v\n", tok)
-			}
-		}
-		fmt.Printf("-----------------------------------\n")
+	env := object.NewEnvironment()
+	evaluated := evaluator.Eval(program, env)
+	if evaluated != nil {
+		io.WriteString(os.Stdout, evaluated.Inspect())
 	}
 
 	return true

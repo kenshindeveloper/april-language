@@ -24,6 +24,7 @@ const APRIL_LOGO = `
 
 func Start(in io.Reader, out io.Writer) {
 	scanner := bufio.NewScanner(in)
+	env := object.NewEnvironment()
 
 	for {
 		fmt.Printf(PROMPT)
@@ -37,11 +38,10 @@ func Start(in io.Reader, out io.Writer) {
 		p := parser.New(l)
 		program := p.ParserProgram()
 		if len(p.Error()) != 0 {
-			printParserErrors(out, p.Error())
+			PrintParserErrors(out, p.Error())
 			continue
 		}
 
-		env := object.NewEnvironment()
 		evaluated := evaluator.Eval(program, env)
 		if evaluated != nil {
 			io.WriteString(out, evaluated.Inspect())
@@ -51,7 +51,7 @@ func Start(in io.Reader, out io.Writer) {
 	}
 }
 
-func printParserErrors(out io.Writer, errors []string) {
+func PrintParserErrors(out io.Writer, errors []string) {
 	io.WriteString(out, APRIL_LOGO)
 	if len(errors) > 1 {
 		io.WriteString(out, "Shit! there are errors:\n")
