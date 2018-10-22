@@ -1,0 +1,7 @@
+// var f:stream = open();
+// f := open("path/...");
+// f := create("path/...")
+// write(f, "texto"); //escribir
+// s := read(f); //leer
+// close(f);
+

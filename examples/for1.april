@@ -1,0 +1,25 @@
+global x:int = 16;
+
+var y:int = 75;
+
+fn gato() { print("miuu!") }
+
+
+if true {
+    print("hola");
+    gato();
+    print("chao");
+
+}
+
+fn perro() { print("GUAGUUUU!"); }
+
+fn foo() {
+    for i := 0; i < 10; i++ {
+        x = 6;
+        print(x);
+    }
+    perro();
+}
+foo();
+print("x: "+str(x));

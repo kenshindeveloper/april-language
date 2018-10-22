@@ -1,0 +1,27 @@
+// **********************************************************
+// **                                                     ***
+// **    Programado por Pandicorn & Kenshin Urashima      ***
+// **    Test: Raiz de Newton en April					  ***
+// **                                                     ***
+// **********************************************************
+
+fn sqr(x:int) double {
+    z := 1.0;
+    cont := 0;
+
+    for (cont < 10) {
+        z = z-(((z*z)-x)/(2*z));
+        print("cont: "+str(cont));
+        cont += 1;
+    }
+    return z;
+}
+
+fn main()
+{
+    sqr(5);
+    j := sqr(2);
+    print("result: "+str(j));
+}
+
+main();

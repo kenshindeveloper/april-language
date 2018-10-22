@@ -1,0 +1,12 @@
+// **********************************************************
+// **                                                     ***
+// **    Programado por Pandicorn & Kenshin Urashima      ***
+// **    Test: Multi Archivo en April					  ***
+// **                                                     ***
+// **********************************************************
+
+import "examples/_tmpVar.april"
+import "examples/_tmpBucle.april"
+
+
+print("x: "+str(x));

@@ -1,0 +1,5 @@
+import "examples/test.april"
+import "examples/bucle.april"
+
+
+print("x: "+str(x));

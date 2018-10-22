@@ -1,0 +1,26 @@
+// **********************************************************
+// **                                                     ***
+// **    Programado por Pandicorn & Kenshin Urashima      ***
+// **    Test: break en April							  ***
+// **                                                     ***
+// **********************************************************
+
+fn foo(f:func) {
+    f();
+    print("cierre");
+}
+
+fn main() {
+    t := fn() int {
+        for (i := 0; i < 100; i++) {
+            print("i: "+str(i));
+            if (i == 5) {
+                break;
+            }
+        }
+        return 10;
+    };
+
+    foo(t);
+}
+main();

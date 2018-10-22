@@ -1,0 +1,12 @@
+fn foo(nombre:string) func {
+    return fn() { 
+        print("hola, "+str(nombre)); 
+    };
+}
+
+fn main() {
+    x := foo("veronica");
+    x();
+}
+
+main();

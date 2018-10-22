@@ -1,0 +1,14 @@
+print("antes...")
+
+for (i := 0; i < tam; i++) {
+    print("i: "+str(i))
+}
+var identity:func = fn(x:int) int { return x;}; 
+identity(5);
+
+add := fn(x:int, y:int) int { 
+    return x + y;
+};
+ 
+print("add: "+str(add(5 + 5, add(5, 15))));
+print("despues...")
