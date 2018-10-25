@@ -73,7 +73,6 @@ func Start(w io.Writer, r io.Reader, version string) {
 			if inputBlock != "" {
 				input = inputBlock + input
 				inputBlock = ""
-				fmt.Printf("input: %s\n", input)
 			}
 
 			l := lexer.New(input)
