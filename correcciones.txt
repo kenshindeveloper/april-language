@@ -1,0 +1,4 @@
+---0 - arreglar if {} else {} en la consola.
+---1 - corregir la division entr cero.
+---2 - corregir el "foreach" con una variable tipo lista.
+3 - arreglar valor devuelto funcion string - int

@@ -266,8 +266,17 @@ func evalForStatement(node *ast.ForStatement, env *object.Environment) object.Ob
 			listExpr = Eval(impl.Right, extendEnv)
 		case *ast.List:
 			listExpr = Eval(impl.Right, extendEnv)
+		case *ast.Identifier:
+			obj, ok := env.Get(impl.Right.(*ast.Identifier).Name)
+			if ok {
+				_, ok = obj.(*object.List)
+				if !ok {
+					return newError("Line: %d - expression incompatible with for, expression must be type list. %T", node.Line, impl.Right)
+				}
+				listExpr = Eval(impl.Right, extendEnv)
+			}
 		default:
-			return newError("Line: %d - expression incompatible with for, expression must be type list.", node.Line)
+			return newError("Line: %d - expression incompatible with for, expression must be type list. %T", node.Line, impl.Right)
 		}
 
 		if isError(listExpr) {
@@ -717,6 +726,9 @@ func evalDoubleInfixExpression(operator string, leftVar float64, rightVar float6
 	case "*":
 		return &object.Double{Value: (leftVar * rightVar)}
 	case "/":
+		if rightVar == 0 {
+			return newError("division by zero")
+		}
 		return &object.Double{Value: (leftVar / rightVar)}
 	case "<":
 		return boolToBooleanObject(leftVar < rightVar)
@@ -789,6 +801,9 @@ func evalIntegerInfixExpression(operator string, left object.Object, right objec
 	case "*":
 		return &object.Integer{Value: (leftVar * rightVar)}
 	case "/":
+		if rightVar == 0 {
+			return newError("division by zero")
+		}
 		return &object.Integer{Value: (leftVar / rightVar)}
 	case "%":
 		return &object.Integer{Value: (leftVar % rightVar)}
@@ -881,7 +896,7 @@ func unwrapReturnFunctionValue(fn *object.Function, obj object.Object) object.Ob
 	if returnValue, ok := obj.(*object.ReturnStatement); ok {
 		if fn.Return.Name == "int" && returnValue.Value.Type() == object.INTEGER_OBJ {
 			return returnValue.Value
-		} else if fn.Return.Name == "double" && returnValue.Value.Type() == object.DOUBLE_OBJ || returnValue.Value.Type() == object.INTEGER_OBJ {
+		} else if fn.Return.Name == "double" && (returnValue.Value.Type() == object.DOUBLE_OBJ || returnValue.Value.Type() == object.INTEGER_OBJ) {
 			if returnValue.Value.Type() == object.INTEGER_OBJ {
 				return &object.Double{Value: float64(returnValue.Value.(*object.Integer).Value)}
 			}
@@ -981,7 +996,7 @@ func unwrapReturnValue(fn *object.FunctionClosure, obj object.Object) object.Obj
 	if returnValue, ok := obj.(*object.ReturnStatement); ok {
 		if fn.Return.Name == "int" && returnValue.Value.Type() == object.INTEGER_OBJ {
 			return returnValue.Value
-		} else if fn.Return.Name == "double" && returnValue.Value.Type() == object.DOUBLE_OBJ || returnValue.Value.Type() == object.INTEGER_OBJ {
+		} else if fn.Return.Name == "double" && (returnValue.Value.Type() == object.DOUBLE_OBJ || returnValue.Value.Type() == object.INTEGER_OBJ) {
 			if returnValue.Value.Type() == object.INTEGER_OBJ {
 				return &object.Double{Value: float64(returnValue.Value.(*object.Integer).Value)}
 			}

@@ -1,25 +1,11 @@
-global x:int = 16;
+// fn suma() string {
+//     return 1+2;
+// }
 
-var y:int = 75;
+// suma();
 
-fn gato() { print("miuu!") }
+add := fn() string {
+    return 1;
+};
 
-
-if true {
-    print("hola");
-    gato();
-    print("chao");
-
-}
-
-fn perro() { print("GUAGUUUU!"); }
-
-fn foo() {
-    for i := 0; i < 10; i++ {
-        x = 6;
-        print(x);
-    }
-    perro();
-}
-foo();
-print("x: "+str(x));
+add();

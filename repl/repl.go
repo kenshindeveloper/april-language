@@ -53,17 +53,27 @@ func Start(w io.Writer, r io.Reader, version string) {
 		}
 
 		input := reader.Text()
-		if ok, _ := regexp.MatchString("^(.*)?\\{( )*$", input); ok {
-			stackBlock.Push("{")
-		} else if ok, _ := regexp.MatchString("^(.*)?\\}( |.)*$", input); ok {
-			stackBlock.Pop()
+
+		for _, char := range input {
+			if char == '{' {
+				stackBlock.Push("{")
+			} else if char == '}' {
+				stackBlock.Pop()
+			}
 		}
+
+		// if ok, _ := regexp.MatchString("^(.*)?\\{( )*$", input); ok {
+		// 	stackBlock.Push("{")
+		// } else if ok, _ := regexp.MatchString("^(.*)?\\}( |.)*$", input); ok {
+		// 	stackBlock.Pop()
+		// }
 
 		switch stackBlock.Len() {
 		case 0:
 			if inputBlock != "" {
 				input = inputBlock + input
 				inputBlock = ""
+				fmt.Printf("input: %s\n", input)
 			}
 
 			l := lexer.New(input)

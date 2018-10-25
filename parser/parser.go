@@ -367,10 +367,9 @@ func (p *Parser) parseReturnStatement() *ast.ReturnStatement {
 	p.nextToken()
 	rs.Expression = p.parseExpression(LESSVALUE)
 
-	if !p.curTokenIs(token.SEMICOLON) {
+	if !p.curTokenIs(token.SEMICOLON) && !p.peekTokenIs(token.RBRACE) {
 		p.nextToken()
 	}
-
 	return rs
 }
 
