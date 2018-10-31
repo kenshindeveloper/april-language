@@ -1,0 +1,16 @@
+// fn foo() {
+//    print("es foo!");
+// }
+
+var base:struct = {
+    x:int,
+    foo:func
+};
+
+base.x = 17;
+
+base.foo = fn() {
+    print(base.x);
+};
+
+base.foo();

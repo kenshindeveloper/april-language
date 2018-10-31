@@ -44,7 +44,10 @@ func Eval(node ast.Node, env *object.Environment) object.Object {
 	case *ast.Function:
 		return evalFunctionStatement(node, env)
 
-	//Expressions
+		//Expressions
+	case *ast.Struct:
+		return evalStructExpression(node, env)
+
 	case *ast.Nil:
 		return &object.Nil{}
 
@@ -347,6 +350,37 @@ func evalForStatement(node *ast.ForStatement, env *object.Environment) object.Ob
 //***************************************************************************************
 //************************************EXPRESSIONS****************************************
 //***************************************************************************************
+func evalStructExpression(node *ast.Struct, env *object.Environment) object.Object {
+	strucObj := &object.Struct{Env: object.NewEnvironmentFn(env)}
+
+	for data, dataType := range node.Element {
+		if _, ok := strucObj.Env.GetLocal(data.Name); !ok {
+			switch dataType.Name {
+			case "int":
+				strucObj.Env.Save(data.Name, &object.Integer{Value: 0})
+			case "double":
+				strucObj.Env.Save(data.Name, &object.Double{Value: 0.0})
+			case "bool":
+				strucObj.Env.Save(data.Name, &object.Boolean{Value: false})
+			case "string":
+				strucObj.Env.Save(data.Name, &object.String{Value: ""})
+			case "list":
+				strucObj.Env.Save(data.Name, &object.List{})
+			case "map":
+				strucObj.Env.Save(data.Name, &object.Hash{})
+			case "func":
+				strucObj.Env.Save(data.Name, &object.FunctionClosure{})
+			case "struct":
+				strucObj.Env.Save(data.Name, &object.Struct{})
+			default:
+				return newError("Line: %d - data type incompatible in struct", node.Line)
+			}
+		} else {
+			return newError("Line: %d - name '%s' exist outside or insede of struct", node.Line, data.Name)
+		}
+	}
+	return strucObj
+}
 
 func evalIndexExpressions(node *ast.IndexExpression, env *object.Environment) object.Object {
 	left := Eval(node.Left, env)
@@ -444,6 +478,8 @@ func isBasicDataType(obj object.Object) bool {
 		return true
 	case *object.Stream:
 		return true
+	case *object.Struct:
+		return true
 	default:
 		return false
 	}
@@ -493,6 +529,38 @@ func evalAssignExpression(node *ast.AssignExpression, env *object.Environment) o
 
 		return evalSetIndexExpression(left, index, value)
 
+	case *ast.InfixExpression:
+		nodeDot, ok := node.Left.(*ast.InfixExpression)
+		if !ok {
+			return newError("error 0.")
+		}
+		if nodeDot.Operator != "." {
+			return newError("error 1.")
+		}
+
+		struc := Eval(nodeDot.Left, env)
+		if isError(struc) {
+			return struc
+		}
+
+		dataStruct, ok := struc.(*object.Struct)
+		if !ok {
+			return newError("error is not a struct type.")
+		}
+
+		_, ok = dataStruct.Env.Get(nodeDot.Right.(*ast.Identifier).Name)
+		if !ok {
+			return newError("Line: %d - var '%s' is not define.", nodeDot.Right.(*ast.Identifier).Line, nodeDot.Right.(*ast.Identifier).Name)
+		}
+
+		// value := Eval(node.Right, dataStruct.Env)
+		value := Eval(node.Right, env)
+		if isError(value) {
+			return value
+		}
+
+		dataStruct.Env.Set(nodeDot.Right.(*ast.Identifier).Name, value)
+		return NIL
 	default:
 		return newError("Line: %d - expression assignment is not possible. ", node.Line)
 	}
@@ -543,6 +611,19 @@ func evalInfixExpressions(node *ast.InfixExpression, env *object.Environment) ob
 			return boolToBooleanObject(false)
 		}
 	}
+
+	if left.Type() != object.STRUCT_OBJ && node.Operator == "." {
+		return newError("Line: %d - the variable '%s' is not type struct.", node.Left.(*ast.Identifier).Line, node.Left.(*ast.Identifier).Name)
+	}
+
+	if left.Type() == object.STRUCT_OBJ && node.Operator == "." {
+		ident, ok := node.Right.(*ast.Identifier)
+		if !ok {
+			return newError("Line: %d - the variables is not identifier. 1", node.Line)
+		}
+		return evalStruct(left, ident)
+	}
+
 	//--------------------------------------
 	//--------------------------------------
 
@@ -552,6 +633,20 @@ func evalInfixExpressions(node *ast.InfixExpression, env *object.Environment) ob
 	}
 
 	return evalInfixExpression(node.Operator, left, right)
+}
+
+func evalStruct(left object.Object, right *ast.Identifier) object.Object {
+	dataStruct, ok := left.(*object.Struct)
+	if !ok {
+		return newError("error is not a struct type.")
+	}
+
+	obj, ok := dataStruct.Env.Get(right.Name)
+	if !ok {
+		return newError("Line: %d - var '%s' is not define.", right.Line, right.Name)
+	}
+
+	return obj
 }
 
 func evalPostfixExpressions(node *ast.PostfixExpression, env *object.Environment) object.Object {

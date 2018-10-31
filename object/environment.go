@@ -59,3 +59,8 @@ func (e *Environment) SaveGlobal(name string, value Object) Object {
 	e.global[name] = value
 	return value
 }
+
+func (e *Environment) GetLocal(name string) (Object, bool) {
+	obj, ok := e.global[name]
+	return obj, ok
+}

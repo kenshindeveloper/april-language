@@ -818,3 +818,34 @@ func (s *Stream) TokenLiteral() string {
 func (s *Stream) String() string {
 	return s.FILE.Name()
 }
+
+//***************************************************************************************
+//***************************************************************************************
+//***************************************************************************************
+
+type Struct struct {
+	Token   token.Token
+	Element map[*Identifier]*Identifier
+	Line    int
+}
+
+func (s *Struct) expressionNode() {}
+
+func (s *Struct) TokenLiteral() string {
+	return s.Token.Literal
+}
+
+func (s *Struct) String() string {
+	var out bytes.Buffer
+
+	elements := []string{}
+	for key, value := range s.Element {
+		elements = append(elements, key.String()+":"+value.String())
+	}
+
+	out.WriteString("{")
+	out.WriteString(strings.Join(elements, ", "))
+	out.WriteString("}")
+
+	return out.String()
+}
