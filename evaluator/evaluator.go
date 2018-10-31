@@ -548,7 +548,7 @@ func evalAssignExpression(node *ast.AssignExpression, env *object.Environment) o
 			return newError("error is not a struct type.")
 		}
 
-		_, ok = dataStruct.Env.Get(nodeDot.Right.(*ast.Identifier).Name)
+		objStr, ok := dataStruct.Env.Get(nodeDot.Right.(*ast.Identifier).Name)
 		if !ok {
 			return newError("Line: %d - var '%s' is not define.", nodeDot.Right.(*ast.Identifier).Line, nodeDot.Right.(*ast.Identifier).Name)
 		}
@@ -557,6 +557,13 @@ func evalAssignExpression(node *ast.AssignExpression, env *object.Environment) o
 		value := Eval(node.Right, env)
 		if isError(value) {
 			return value
+		}
+		if objStr.Type() == object.DOUBLE_OBJ && value.Type() == object.INTEGER_OBJ {
+			dataStruct.Env.Set(nodeDot.Right.(*ast.Identifier).Name, &object.Double{Value: float64(value.(*object.Integer).Value)})
+			return NIL
+
+		} else if objStr.Type() != value.Type() {
+			return newError("Line: %d - assignment is not compatible.", node.Line)
 		}
 
 		dataStruct.Env.Set(nodeDot.Right.(*ast.Identifier).Name, value)
