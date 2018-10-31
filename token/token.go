@@ -19,6 +19,7 @@ const (
 	MAP       = "MAP"
 	FUNC      = "FUNC"
 	STREAM    = "STREAM"
+	STRUCT    = "STRUCT"
 	NIL       = "NIL"
 
 	INT    = "INT"
@@ -100,6 +101,7 @@ var keywords = map[string]TokenType{
 	"double": OPEDOUBLE,
 	"func":   FUNC,
 	"stream": STREAM,
+	"struct": STRUCT,
 	"and":    AND,
 	"or":     OR,
 	"return": RETURN,

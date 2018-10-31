@@ -2,6 +2,8 @@ package lexer
 
 import (
 	"io/ioutil"
+	"regexp"
+	"strings"
 
 	"github.com/kenshindeveloper/april/token"
 )
@@ -48,13 +50,14 @@ func (l *Lexer) ReadFile(path string) bool {
 }
 
 func (l *Lexer) readString() string {
-	str := ""
+	str := []byte{}
 	for l.top.char != '"' {
-		str += string(l.top.char)
+		str = append(str, l.top.char)
 		l.readToken()
 	}
+	// str += "\""
 	l.readToken()
-	return str
+	return string(str)
 }
 
 func (l *Lexer) readToken() {
@@ -214,6 +217,9 @@ func (l *Lexer) NextToken() token.Token {
 	case '}':
 		l.readToken()
 		return token.Token{Type: token.RBRACE, Literal: "}"}
+	case '.':
+		l.readToken()
+		return token.Token{Type: token.DOT, Literal: "."}
 	case 0:
 		return token.Token{Type: token.EOF, Literal: "EOF"}
 	default:
@@ -228,7 +234,8 @@ func (l *Lexer) NextToken() token.Token {
 
 func (l *Lexer) tokenEvaluation() token.Token {
 	ident := ""
-
+	//pregunto si es un caracter.
+	charPos := l.top.position - 1
 	for l.isChar() {
 		ident += string(l.top.char)
 		l.readToken()
@@ -241,8 +248,57 @@ func (l *Lexer) tokenEvaluation() token.Token {
 	if isDouble(ident) {
 		return token.Token{Type: token.DOUBLE, Literal: ident}
 	}
+	//^([0-9]|[a-zA-Z]|_)*(\\.)+([0-9]|[a-zA-Z]|_)*$
 
+	if ok, _ := regexp.MatchString("^(([0-9]|[a-zA-Z])*(\\.)+([0-9]|[a-zA-Z])*)*$", ident); ok {
+		// fmt.Println("ENTRO")
+		l.top.position = charPos + strings.Index(ident, ".") + 1
+		l.top.char = l.top.input[l.top.position-1]
+		text := ident[:strings.Index(ident, ".")]
+
+		if isNumeric(text) {
+			return token.Token{Type: token.INT, Literal: text}
+		}
+
+		if isDouble(text) {
+			return token.Token{Type: token.DOUBLE, Literal: text}
+		}
+
+		return token.Token{Type: token.LookKeyword(text), Literal: text}
+	}
 	return token.Token{Type: token.LookKeyword(ident), Literal: ident}
+}
+
+func (l *Lexer) Save() {
+	currentPosition = l.top.position
+}
+
+func (l *Lexer) Continue() {
+	l.top.position = currentPosition
+	l.top.char = l.top.input[l.top.position-1]
+}
+
+func (l *Lexer) skypeSpace() {
+	for l.top.char == ' ' || l.top.char == '\n' || l.top.char == '\t' || l.top.char == '\a' || l.top.char == '\r' {
+		if l.top.char == '\n' {
+			NUMBER_LINE += 1
+		}
+		l.readToken()
+	}
+}
+
+func (l *Lexer) isChar() bool {
+	if l.top.char >= 'a' && l.top.char <= 'z' || l.top.char >= 'A' && l.top.char <= 'Z' || l.top.char == '_' || l.isDigit() || l.top.char == '.' {
+		return true
+	}
+	return false
+}
+
+func (l *Lexer) isDigit() bool {
+	if l.top.char >= '0' && l.top.char <= '9' {
+		return true
+	}
+	return false
 }
 
 func isNumeric(value string) bool {
@@ -261,37 +317,4 @@ func isDouble(value string) bool {
 		}
 	}
 	return true
-}
-
-func (l *Lexer) Save() {
-	currentPosition = l.top.position
-}
-
-func (l *Lexer) Continue() {
-	l.top.position = currentPosition
-	l.top.char = l.top.input[l.top.position-1]
-}
-
-func (l *Lexer) skypeSpace() {
-	for l.top.char == ' ' || l.top.char == '\n' || l.top.char == '\t' || l.top.char == '\a' || l.top.char == '\r' {
-		if l.top.char == '\n' {
-			NUMBER_LINE += 1
-		}
-
-		l.readToken()
-	}
-}
-
-func (l *Lexer) isChar() bool {
-	if l.top.char >= 'a' && l.top.char <= 'z' || l.top.char >= 'A' && l.top.char <= 'Z' || l.top.char == '_' || l.isDigit() || l.top.char == '.' {
-		return true
-	}
-	return false
-}
-
-func (l *Lexer) isDigit() bool {
-	if l.top.char >= '0' && l.top.char <= '9' {
-		return true
-	}
-	return false
 }
