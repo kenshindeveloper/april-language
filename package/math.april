@@ -1,0 +1,139 @@
+// **********************************************************
+// **                                                     ***
+// **    Programado por Pandicorn & Kenshin Urashima      ***
+// **    lib Math           							  ***
+// **                                                     ***
+// **********************************************************
+
+
+fn Abs( x:double ) double {
+    if ( 0 <= x ){
+        return x; 
+    }else{
+        return x * (-1); 
+    }
+}
+
+fn Cbrt( x:double ) double {
+    z := 1.0;
+    for (cont:=0; cont < 25; cont++) {
+        z = z-(((z*z*z)-x)/(3*z*z));
+    }
+    return z;
+}
+
+
+fn Ceil( x:double ) int {
+    return GoCeil(x);
+}
+
+
+var PI:double = 3.1415926535897932384626433832795028841971693993751;
+
+fn CalculoPi( x:int ) double {
+    var factor:double;
+    var pi:double = 1.0;
+    for (i:=1; i<=x; i++){
+        factor = 4.0*i*i/(2*i-1)/(2*i+1);
+        pi = pi * factor;
+    }
+    pi = pi * 2;
+    return pi;
+}
+
+var e:double = 2.71828182845904523536028747135266249775724709369995;
+
+fn CalculoEuler() double {
+    euler := 1.0;
+    for (i := 1; i < 50; i++) {
+        euler = euler + 1 / double(Factorial(i));
+    }
+    return euler;
+
+}
+
+fn Exp( x:int ) double {
+    return Producer(e,x);
+}
+
+fn Exp2( x:int ) double {
+    return Producer(2,x);
+}
+
+fn Factorial( x:int ) int {
+    multi:=1;
+    for( i:=x; i>0; i-- ){
+        multi = multi * i;
+    }
+    return multi;
+}
+
+fn Floor( x:double ) double {
+    return GoFloor(x);
+}
+
+fn Log(x:double ) double {
+    return GoLog(x);
+}
+
+fn Log10( x:double ) double {
+    return GoLog10(x);
+}
+
+fn Max( x:double, y:double ) double {
+    return GoMax(x,y);
+}
+
+fn Min( x:double, y:double ) double {
+    return GoMin(x,y);
+}
+
+fn Mod( x:int, y:int ) int {
+    return x % y;
+}
+
+fn Pow( x:double, y:double ) double {
+    return GoPow(x,y);
+}
+
+fn Pow10( n:int ) double {
+    return GoPow10(n);
+}
+
+fn Producer(x:double, n:int) double {
+    result:=1.0;
+    for(i:=1; i<=n; i++){
+        result = result * x;
+    }
+    return result;
+}
+
+
+fn Round( x:double ) double {
+    return GoRound(x);
+}
+
+
+fn Sqrt( x:double ) double {
+    z := 1.0;
+    for (cont:=0; cont < 10; cont++) {
+        z = z-(((z*z)-x)/(2*z));
+    }
+    return z;
+}
+
+
+fn Trunc( x:double ) double {
+    return GoTrunc(x);
+}
+
+// fn main()
+// {
+
+//     println("result: = "+str(Min(55.1,8.2)));
+
+// }
+
+// main();
+
+

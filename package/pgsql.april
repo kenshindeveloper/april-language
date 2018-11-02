@@ -1,0 +1,18 @@
+// **********************************************************
+// **                                                     ***
+// **    Programado por Pandicorn & Kenshin Urashima      ***
+// **    Socket  DB PostGreSQL              			  ***
+// **                                                     ***
+// **********************************************************
+
+
+import "package/string.april"
+
+fn main() {
+
+    printf("\n hola \t mundo \n");
+
+}
+
+main();
+ 

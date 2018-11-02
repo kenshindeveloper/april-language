@@ -1,0 +1,122 @@
+// **********************************************************
+// **                                                     ***
+// **    Programado por Pandicorn & Kenshin Urashima      ***
+// **    lib String           							  ***
+// **                                                     ***
+// **********************************************************
+
+import "package/math.april"
+
+
+
+// split
+fn Split(  text:string, token:string  ) list {
+    var l:list = [];
+    nText := len(text);
+    nToken := len(token);
+    tmp := "";
+    cont := 0;
+    iToken := 0;
+
+    for (x := 0; x < nToken; x++){
+        text = text + " ";
+    }
+
+    for (i := 0; i < nText; i++ ) {
+        iToken = 0;
+        cont = 0;
+        for (j := i; j < i + nToken; j++ ) {
+            if (text[j] == token[iToken]){
+                cont++;
+            }
+            iToken++;
+        }
+        if ( cont == nToken ) {
+            i = i + nToken - 1;
+            push(l,tmp);
+            tmp="";
+            i++;
+        }
+        tmp = tmp + text[i];
+    }
+    if ( ( len(tmp) > 0 ) and (tmp != " ") ) {
+        push(l,tmp);
+    }
+    return l;
+}
+
+// join
+fn Join( l:list, token:string  ) string {
+    
+    result := "";
+    nlist := len(l); 
+    for ( i:=0; i < nlist-1; i++ ){
+        result = result + l[i] + token;
+    }
+    result = result + l[nlist-1];
+    return result; 
+}
+
+// // substring 
+fn SubString( word:string , begin:int, end:int) string {
+
+    max := int(Max(begin,end));
+    min := int(Min(begin,end));
+
+    result := " ";
+    for (i:=min; i <= max; i++) {
+        result = result + str(word[i]);
+    }
+
+    return result;
+}
+
+// search
+fn Search( text:string,  word:string ) int {
+    cont:=0;
+    nText := len(text);
+    nWord := len(word);
+    tmp := "";
+
+    for (x := 0; x<=nWord; x++){
+        text = text + " ";
+    }
+
+    for (i := 0; i <= nText-nWord-1; i++ ) {
+        for (j := 0; j < nWord; j++ ) {
+            tmp = tmp + text[i+j];
+        }
+        if (tmp == word){
+            cont++;
+        }
+        tmp="";
+    }
+    return cont;
+}
+
+
+// countWords
+fn CountWords(  text:string ) int {
+    nText := len(text);
+    tmp := "";
+    contEnd := 0;
+
+    text = text + " ";
+
+    i := 0;
+    for ( i < nText ) {
+        if (text[i] != " "){
+            tmp = tmp + text[i];
+        }
+        if ((tmp != "")  and (text[i] == " " )){
+            contEnd++;
+            tmp = ""; 
+        }
+        i++;
+    }
+    if (tmp != ""){
+            contEnd++;
+    }
+    return contEnd;
+}
+
