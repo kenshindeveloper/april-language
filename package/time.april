@@ -1,0 +1,49 @@
+// **********************************************************
+// **                                                     ***
+// **    Programado por Pandicorn & Kenshin Urashima      ***
+// **    lib  Time          							  ***
+// **                                                     ***
+// **********************************************************
+
+// Constant 
+    // Month
+    var MONTH:list = [ "January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December" ];
+
+    // Days
+    var DAY:list = [ "Monday", "Tuesday", "Wenestday", "Thursday", "Friday", "Saturday", "Sunday" ]; 
+
+// Time
+fn Now() {
+    print("Time = ");
+    GoNow();
+    println(" ");
+}
+
+fn Year() {
+    print("Year = ");
+    GoYear();
+    println(" ");
+}
+
+fn Month() {
+    print("Month = ");
+    GoMonth();
+    println(" ");
+}
+
+fn Day() {
+    print("Day = ");
+    GoDay();
+    println(" ");
+}
+
+
+
+fn main() {
+    Now();
+    Year();
+    Month();
+    Day();
+}
+
+main();

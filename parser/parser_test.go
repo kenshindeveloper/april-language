@@ -8,6 +8,27 @@ import (
 	"github.com/kenshindeveloper/april/lexer"
 )
 
+func TestStructExpression(t *testing.T) {
+	input := `{x:int, y:string}`
+
+	l := lexer.New(input)
+	p := New(l)
+	program := p.ParserProgram()
+	checkParserErrors(t, p)
+	if program == nil {
+		t.Fatalf("program is null")
+	}
+
+	if len(program.Statements) != 1 {
+		t.Fatalf("len(program.Statements) is not equal '%d'. got='%d'", 1, len(program.Statements))
+	}
+
+	_, ok := program.Statements[0].(*ast.ExpressionStatement)
+	if !ok {
+		t.Fatalf("program.Statements[0] is not equal '*ast.ExpressionStatement'. got='%T'", program.Statements[0])
+	}
+}
+
 func TestGlobalStatement(t *testing.T) {
 	tests := []struct {
 		input string

@@ -53,6 +53,7 @@ var precedens = map[token.TokenType]int{
 	token.LBRACKET:    INDEX,
 	token.OPEPLUS:     INDEX,
 	token.OPEMIN:      INDEX,
+	token.DOT:         INDEX,
 }
 
 type (
@@ -98,7 +99,8 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerPrefix(token.IF, p.parseIfExpression)
 	p.registerPrefix(token.FNCLOSURE, p.parseFnClosure)
 	p.registerPrefix(token.LBRACKET, p.parseListExpression)
-	p.registerPrefix(token.LBRACE, p.parseHashExpression)
+	// p.registerPrefix(token.LBRACE, p.parseHashExpression)
+	p.registerPrefix(token.LBRACE, p.parseEvalBracketExapression)
 
 	//registro de funciones infijas
 	p.infixFns = make(map[token.TokenType]infixFn)
@@ -124,6 +126,7 @@ func New(l *lexer.Lexer) *Parser {
 	p.registerInfix(token.DECLARATION, p.parseImplicitExpression)
 	p.registerInfix(token.LPAREN, p.parseCallExpression)
 	p.registerInfix(token.LBRACKET, p.parseIndexExpression)
+	p.registerInfix(token.DOT, p.parseInfixExpression)
 
 	return p
 }
@@ -668,6 +671,8 @@ func (p *Parser) isPeekBasicType() bool {
 		return true
 	case p.peekTokenIs(token.STREAM):
 		return true
+	case p.peekTokenIs(token.STRUCT):
+		return true
 	default:
 		return false
 	}
@@ -750,6 +755,73 @@ func (p *Parser) parsePostfixExpression() ast.Expression {
 	p.nextToken()
 	p.nextToken()
 	return postfix
+}
+
+func (p *Parser) parseEvalBracketExapression() ast.Expression {
+	// return p.parseHashExpression()
+	flag := false
+
+	//-------------------------------------------------
+	// OJO NO ES LA MEJOR FORMA DE RECONOCER UN STRUCT Y UN MAP
+	if !p.peekTokenIs(token.RBRACE) {
+		p.lexer.Save()
+		auxCurToken := p.curToken
+		auxPeekToken := p.peekToken
+		for !p.curTokenIs(token.RBRACE) && !p.curTokenIs(token.EOF) {
+			if p.isPeekBasicType() {
+				flag = true
+				break
+			}
+			p.nextToken()
+		}
+
+		p.lexer.Continue()
+		p.curToken = auxCurToken
+		p.peekToken = auxPeekToken
+	}
+	//-------------------------------------------------
+
+	switch flag {
+	case true:
+		return p.parseStrucExpression()
+	default:
+		return p.parseHashExpression()
+	}
+}
+
+func (p *Parser) parseStrucExpression() ast.Expression {
+	s := &ast.Struct{Token: p.curToken, Line: lexer.NUMBER_LINE}
+	s.Element = make(map[*ast.Identifier]*ast.Identifier)
+
+	for !p.peekTokenIs(token.RBRACE) {
+		p.nextToken()
+		if token.LookKeyword(p.curToken.Literal) != token.IDENT {
+			msg := fmt.Sprintf("Line: %d - struct var definition is incorrect, expected token type 'IDENTIFIER', got='%s'", lexer.NUMBER_LINE, p.curToken.Literal)
+			p.errors = append(p.errors, msg)
+			return nil
+		}
+		data := &ast.Identifier{Token: p.curToken, Name: p.curToken.Literal, Line: lexer.NUMBER_LINE}
+		if !p.expectedTokenPeek(token.COLON) {
+			return nil
+		}
+		if !p.isPeekBasicType() {
+			msg := fmt.Sprintf("Line: %d - struct type definition is incorrect, expected token type 'IDENTIFIER', got='%s'", lexer.NUMBER_LINE, p.peekToken.Literal)
+			p.errors = append(p.errors, msg)
+			return nil
+		}
+		p.nextToken()
+		dataType := &ast.Identifier{Token: p.curToken, Name: p.curToken.Literal, Line: lexer.NUMBER_LINE}
+
+		s.Element[data] = dataType
+		if !p.peekTokenIs(token.RBRACE) && !p.expectedTokenPeek(token.COMMA) {
+			return nil
+		}
+	}
+
+	if !p.expectedTokenPeek(token.RBRACE) {
+		return nil
+	}
+	return s
 }
 
 func (p *Parser) parseHashExpression() ast.Expression {
@@ -1029,8 +1101,9 @@ func (p *Parser) parseAssignOpeExpression(left ast.Expression) ast.Expression {
 func (p *Parser) parseAssignExpression(left ast.Expression) ast.Expression {
 	_, okIdent := left.(*ast.Identifier)
 	_, okIndex := left.(*ast.IndexExpression)
+	_, okStruct := left.(*ast.InfixExpression)
 
-	if !okIdent && !okIndex {
+	if !okIdent && !okIndex && !okStruct {
 		msg := fmt.Sprintf("Line: %d - declaration is not possible\n", lexer.NUMBER_LINE)
 		p.errors = append(p.errors, msg)
 		return nil

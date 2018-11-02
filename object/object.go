@@ -25,6 +25,7 @@ const (
 	LIST_OBJ     = "LIST"
 	HASH_OBJ     = "HASH"
 	STREAM_OBJ   = "STREAM"
+	STRUCT_OBJ   = "STRUCT"
 )
 
 type ObjectType string
@@ -395,4 +396,20 @@ func (s *Stream) Inspect() string {
 	}
 
 	return "null"
+}
+
+//***************************************************************************************
+//***************************************************************************************
+//***************************************************************************************
+
+type Struct struct {
+	Env *Environment
+}
+
+func (s *Struct) Type() ObjectType {
+	return STRUCT_OBJ
+}
+
+func (s *Struct) Inspect() string {
+	return "struct"
 }
