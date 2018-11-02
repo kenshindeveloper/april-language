@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"os"
 
+	"github.com/kenshindeveloper/april/evaluator"
 	"github.com/kenshindeveloper/april/file"
 	"github.com/kenshindeveloper/april/repl"
 )
@@ -13,6 +14,9 @@ const minus = 0
 const micro = 0
 
 func main() {
+
+	evaluator.InitBuiltins()
+
 	switch len(os.Args) {
 	case 1:
 		repl.Start(os.Stdout, os.Stdin, fmt.Sprintf("%d.%d.%d", mayor, minus, micro))

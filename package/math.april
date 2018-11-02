@@ -127,13 +127,13 @@ fn Trunc( x:double ) double {
     return GoTrunc(x);
 }
 
-// fn main()
-// {
+fn main()
+{
 
-//     println("result: = "+str(Min(55.1,8.2)));
+    print("result: = "+str(len("hola")));
 
-// }
+}
 
-// main();
+main();
 
 
