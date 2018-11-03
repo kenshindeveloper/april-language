@@ -1,0 +1,67 @@
+// **********************************************************
+// **                                                     ***
+// **    Programado por Pandicorn & Kenshin Urashima      ***
+// **    Test: for tres expresiones                       ***
+// **                                                     ***
+// **********************************************************
+
+m := [[0, 1, 2, 3, 4], [5, 6, 7, 8, 9, 16, 86]];
+
+h := 10;
+
+for (i := 0; i < len(m); i++) {
+    for (j := 0; j < len(m[i]); j++) {
+        print("m: "+str(m[i][j]));
+    }
+    h++;
+    print(h)
+}
+
+
+print(h);
+
+print("-------------------------");
+i := 0;
+print(i);
+for (i < 10) {
+    x := 1;
+    print(x);
+    i++;
+}
+
+print("i: "+str(i));
+
+print("-------------------------");
+
+for (j := 0; j < 10; j++) {
+    k := 1;
+    print("j: "+str(k))
+    j++;
+}
+
+print("-------------------------");
+
+var l:list;
+push(l, 9);
+push(l, 5);
+push(l, 5);
+push(l, 5);
+push(l, 5);
+push(l, 7);
+
+for (k := 0; k < len(l); k++) {
+    print("l: "+str(l[k]));
+}
+
+print("-------------------------");
+
+// mapa := {"cero": 0, "uno": 1, "dos":2, "tres":3};
+var mapa:map = {"cero": 0, "uno": 1, "dos":2, "tres":3};
+
+print(mapa["cero"]);
+print(mapa["uno"]);
+print(mapa["dos"]);
+print(mapa["tres"]);
+
+// x := fn(a, b) { return a+b; }
+// o := x(5, 6);

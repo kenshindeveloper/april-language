@@ -1,18 +1,26 @@
 // **********************************************************
 // **                                                     ***
 // **    Programado por Pandicorn & Kenshin Urashima      ***
-// **    Test: fibonacci en April                         ***
+// **    Test: break en April							  ***
 // **                                                     ***
 // **********************************************************
 
-fn fibonacci(valor:int) double {
-    if (valor < 3) { 
-		if (valor <= 0) { return 0; } 
-		else { return 1; } 
-	} 
-    else { return fibonacci(valor-1) +  fibonacci(valor-2); }
+fn foo(f:func) {
+    f();
+    print("cierre");
 }
 
-x := 20;
-result := fibonacci(x);
-print("result: "+str(result));
+fn main() {
+    t := fn() int {
+        for (i := 0; i < 100; i++) {
+            print("i: "+str(i));
+            if (i == 5) {
+                break;
+            }
+        }
+        return 10;
+    };
+
+    foo(t);
+}
+main();

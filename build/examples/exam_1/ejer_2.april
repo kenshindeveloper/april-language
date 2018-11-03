@@ -1,18 +1,20 @@
 // **********************************************************
 // **                                                     ***
 // **    Programado por Pandicorn & Kenshin Urashima      ***
-// **    Test: fibonacci en April                         ***
+// **    Test: Ejercicio# 2                               ***
 // **                                                     ***
 // **********************************************************
 
-fn fibonacci(valor:int) double {
-    if (valor < 3) { 
-		if (valor <= 0) { return 0; } 
-		else { return 1; } 
-	} 
-    else { return fibonacci(valor-1) +  fibonacci(valor-2); }
+// 7 -> 7, 13 -> 4, 492 -> 6, 5678 -> 8 
+num := 5678;
+sum := 0;
+
+for(num > 0 ){
+    sum += num % 10;
+    if (sum > 9) {
+        sum = int(sum / 10) + (sum % 10);
+    }
+    num = int(num / 10);
 }
 
-x := 20;
-result := fibonacci(x);
-print("result: "+str(result));
+print("sum: "+str(sum));

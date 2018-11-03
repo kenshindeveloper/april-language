@@ -1,0 +1,47 @@
+// **********************************************************
+// **                                                     ***
+// **    Programado por Pandicorn & Kenshin Urashima      ***
+// **    Test: Ejercicio# 5                               ***
+// **                                                     ***
+// **********************************************************
+
+global CERO:string = "-----";
+global UNO:string = ".----";
+global DOS:string = "..---";
+global TRES:string = "...--";
+global CUATRO:string = "....-";
+global CINCO:string = ".....";
+global SEIS:string = "-....";
+global SIETE:string = "--...";
+global OCHO:string = "---..";
+global NUEVE:string = "----.";
+
+fn morse_to_int(texto:string) int {
+    if texto == CERO { return 0; }
+    if texto == UNO { return 1; }
+    if texto == DOS { return 2; }
+    if texto == TRES { return 3; }
+    if texto == CUATRO { return 4; }
+    if texto == CINCO { return 5; }
+    if texto == SEIS { return 6; }
+    if texto == SIETE { return 7; }
+    if texto == OCHO { return 8; }
+    if texto == NUEVE { return 9; }
+    return -1;
+}
+//2437682,407453,8610022
+entrada := "..---/....-/...--/--.../-..../---../..---*....-/-----/--.../....-/...../...--*---../-..../.----/-----/-----/..---/..---F";
+acumulador := "";
+numero := "";
+
+for i := 0; i < len(entrada); i += 1 {
+    if (entrada[i] == "/") or (entrada[i] == "F") or (entrada[i] == "*") {
+        numero += str(morse_to_int(acumulador));
+        acumulador = "";
+        if entrada[i] == "*" { numero += ","; }
+    }
+    else {
+        acumulador += entrada[i];
+    }
+}
+print("resultado: "+str(numero));
