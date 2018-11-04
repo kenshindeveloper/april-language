@@ -1,0 +1,80 @@
+// **********************************************************
+// **                                                     ***
+// **    Programado por Pandicorn & Kenshin Urashima      ***
+// **    Test: Ejercicio# 4                               ***
+// **                                                     ***
+// **********************************************************
+
+fn num_digitos(x:int) int {
+    num := 0;
+    for (x > 0) { x = int(x / 10); num += 1;}
+    return num;
+}
+
+fn es_primo(num:int) bool {
+    if ((num == 1) or (num == 2)) { return true; }
+    //i in range(2, num-1)
+    for (i := 2; i < (num-1); i++) {
+        if ((num % i) == 0) {
+            return false;
+        }
+    }
+    return true;
+}
+
+fn par_mayor(num:int) int {
+    dig := 0;
+    mayor := 0;
+    
+    for (num > 0) {
+        dig = num % 10;
+        if (((dig % 2) == 0) and (dig > mayor)) { mayor = dig; }
+        num = int(num / 10);
+    }
+    
+    return mayor;
+}
+
+// x := 789324; //caso uno
+x := 789324; //maximo 2147483647
+dig := 0;
+residuo := 0;
+resultado := 0;
+dif := 0;
+
+if (num_digitos(x) < 9) {
+    for (x > 0) {
+        dig = x % 10;
+        residuo = dig % 3;
+        if (residuo < 2) { residuo += 1; }
+        else { residuo += 4; }
+        
+        if (resultado == 0) {
+            resultado += residuo;
+            dif = 10;
+        }
+        else {
+            resultado += residuo * dif;
+            dif *= 10;
+        }
+        x = int(x / 10);
+    }
+} 
+else {
+    mayor := par_mayor(x);
+    for (x > 0) {
+        dig = x % 10;
+        if (es_primo(dig)) { dig = mayor; }
+
+        if (resultado == 0) {
+            resultado +=  dig;
+            dif = 10;
+        }
+        else {
+            resultado += dig * dif;
+            dif *= 10;
+        }
+        x = int(x / 10);
+    }
+}
+print("resultado: "+str(resultado));

@@ -3,7 +3,7 @@ global num:int = 100;
 fn crear(itera:int) {
     if itera < num {
         file := create("test/"+str(itera)+".txt");
-        write(file, "fichero: "+str(itera)+"\nfichero");
+        write(file, "fichero: "+str(itera));
         close(file);
         crear(itera+1);
     }
@@ -17,6 +17,6 @@ crear(0);
 //     close(file);
 // }
 
-// for i := 0; i < num; i++ {
-//     remove("test/"+str(i)+".txt");
-// }
+for i := 0; i < num; i++ {
+    remove("test/"+str(i)+".txt");
+}

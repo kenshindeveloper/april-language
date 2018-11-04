@@ -1,18 +1,12 @@
 // **********************************************************
 // **                                                     ***
 // **    Programado por Pandicorn & Kenshin Urashima      ***
-// **    Test: fibonacci en April                         ***
+// **    Test: Multi Archivo en April					  ***
 // **                                                     ***
 // **********************************************************
 
-fn fibonacci(valor:int) double {
-    if (valor < 3) { 
-		if (valor <= 0) { return 0; } 
-		else { return 1; } 
-	} 
-    else { return fibonacci(valor-1) +  fibonacci(valor-2); }
-}
+import "examples/_tmpVar.april"
+import "examples/_tmpBucle.april"
 
-x := 20;
-result := fibonacci(x);
-print("result: "+str(result));
+
+print("x: "+str(x));

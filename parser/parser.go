@@ -804,6 +804,7 @@ func (p *Parser) parseStrucExpression() ast.Expression {
 		if !p.expectedTokenPeek(token.COLON) {
 			return nil
 		}
+
 		if !p.isPeekBasicType() {
 			msg := fmt.Sprintf("Line: %d - struct type definition is incorrect, expected token type 'IDENTIFIER', got='%s'", lexer.NUMBER_LINE, p.peekToken.Literal)
 			p.errors = append(p.errors, msg)

@@ -1,0 +1,50 @@
+// **********************************************************
+// **                                                     ***
+// **    Programado por Pandicorn & Kenshin Urashima      ***
+// **    Test: Operador en April						  ***
+// **                                                     ***
+// **********************************************************
+
+fn main()
+{
+	var x:string;
+    var y:string;
+
+    x = "x";
+    y = "x";
+
+    if (x == y)
+    {
+        print("x == y"+" x=" + x+ " y=" + y);
+    }
+
+    x = "x";
+    y = "y";
+    if (x != y)
+    {
+        print(""+"x != y"+" x="+ x +" y="+y);
+    }
+
+    if (x <= y)
+    {
+        print(""+"x <= y"+" x=" + x+" y=" + y);
+    }
+    
+    if (x >= y)
+    {
+        print(""+"x >= y"+" x=" + x+" y=" + y);
+    }
+    
+    if (x < y)
+    {
+        print(""+"x > y"+ " x=" + x+ " y=" + y);
+    }
+
+    if (x > y)
+    {
+        print(""+"x > y"+ " x=" + x+ " y=" + y);
+    }
+
+
+}
+main();

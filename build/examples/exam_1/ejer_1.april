@@ -1,0 +1,50 @@
+// **********************************************************
+// **                                                     ***
+// **    Programado por Pandicorn & Kenshin Urashima      ***
+// **    Test: Ejercicio# 1                               ***
+// **                                                     ***
+// **********************************************************
+
+// var num:int = 13307; //forma explicita
+num := 0; //forma implicita
+
+// var result:int = num; //forma explicita
+result := 0; //forma implicita
+
+// var current:int = 0; //forma explicita
+current := 0; //forma implicita
+
+// var prev:int = 10; //forma explicita
+prev := 0; //forma implicita
+
+// var flag:bool = false; //forma explicita
+flag := false; //forma implicita
+l := [13357, 267, 889, 555, 14, 433, 2517, 771];
+
+for (i := 0; i<len(l) ;i++) {
+
+    token := l[i];
+    num = token;
+    result = num;
+    current = 0;
+    prev = 10;
+    flag = false;
+
+    for ((not flag) and (result > 0)) {
+        current = result % 10;
+        if (current > prev) {
+            flag = true;
+        }
+        else {
+            prev = current;
+            result = int(result / 10); //toda division te devuelve un double...
+        }
+    }
+
+    if (not flag )
+    { 
+        print(str(token)+" ES, es un numero de digitos incremental..."); 
+    }else { 
+        print(str(token)+" NO ES, es un numero de digitos incremental..."); 
+    }
+}
