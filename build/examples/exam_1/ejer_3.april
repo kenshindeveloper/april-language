@@ -1,0 +1,40 @@
+// **********************************************************
+// **                                                     ***
+// **    Programado por Pandicorn & Kenshin Urashima      ***
+// **    Test: Ejercicio# 3                               ***
+// **                                                     ***
+// **********************************************************
+
+entrada := "EL ESTUDIO DIGNIFICA A LA PERSONA";
+// entrada := "la vida es bella";
+salida := "";
+prev := "";
+palabra := "";
+i := len(entrada)-1;
+j := 0;
+
+for i >= 0 {
+    if ((entrada[i] == " ") and (prev != " ") and ((len(palabra) > 0)) or (i == 0)) {
+        print("palabra: |"+str(palabra)+"|");
+        if (i == 0) and (palabra[i] != " ") { palabra += entrada[i]; }
+        j = len(palabra)-1;
+        flag := false;
+        for j >= 0 {
+            if (palabra[j] != "A") and (palabra[j] != "a") and (palabra[j] != "E") and (palabra[j] != "e") and (palabra[j] != "I") and (palabra[j] != "i") and (palabra[j] != "O") and (palabra[j] != "o") and (palabra[j] != "U") and (palabra[j] != "u") {
+                salida = salida + palabra[j]; 
+				flag = true;
+            }
+            j -= 1;
+        }
+
+        if flag and (i > 0) { salida += " "; }
+        palabra = "";
+    }
+    else {
+        if entrada[i] != " " { palabra += entrada[i]; }
+    }
+    i -= 1;
+}
+
+print("entrada: "+entrada);
+print("salida: "+salida);

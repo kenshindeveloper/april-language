@@ -1,0 +1,11 @@
+// fn suma() string {
+//     return 1+2;
+// }
+
+// suma();
+
+add := fn() string {
+    return "1";
+};
+
+add();

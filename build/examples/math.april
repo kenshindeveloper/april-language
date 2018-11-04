@@ -1,0 +1,84 @@
+// **********************************************************
+// **                                                     ***
+// **    Programado por Pandicorn & Kenshin Urashima      ***
+// **    lib Math           							  ***
+// **                                                     ***
+// **********************************************************
+
+fn Abs( x:double ) double {
+    if ( 0 <= x ){
+        x
+    }else{
+        x = x * (-1)
+    }
+}
+
+fn Acos( x:double ) double {
+
+}
+
+
+fn Acosh(x:double) double {}
+fn Asin(x:double) double {}
+fn Asinh(x:double) double {}
+fn Atan(x:double) double {}
+fn Atan2(y, x:double) double {}
+fn Atanh(x:double) double {}
+fn Cbrt(x:double) double {}
+fn Ceil(x:double) double {}
+fn Copysign(x:double, y:double) double {}
+fn Cos(x:double) double {}
+fn Cosh(x:double) double {}
+fn Dim(x:double, y:double) double {}
+fn Erf(x:double) double {}
+fn Erfc(x:double) double {}
+fn Erfcinv(x:double) double {}
+fn Erfinv(x:double) double {}
+fn Exp(x:double) double {}
+fn Exp2(x:double) double {}
+fn Expm1(x:double) double {}
+fn Float32bits(f float32) uint32
+fn Float32frombits(b uint32) float32
+fn double {}bits(f double {}) uint64
+fn double {}frombits(b uint64) double {}
+fn Floor(x:double) double {}
+fn Frexp(f double {}) (frac double {}, exp int)
+fn Gamma(x:double) double {}
+fn Hypot(p, q double {}) double {}
+fn Ilogb(x:double) int
+fn Inf(sign int) double {}
+fn IsInf(f double {}, sign int) bool
+fn IsNaN(f double {}) (is bool)
+fn J0(x:double) double {}
+fn J1(x:double) double {}
+fn Jn(n int, x:double) double {}
+fn Ldexp(frac double {}, exp int) double {}
+fn Lgamma(x:double) (lgamma double {}, sign int)
+fn Log(x:double) double {}
+fn Log10(x:double) double {}
+fn Log1p(x:double) double {}
+fn Log2(x:double) double {}
+fn Logb(x:double) double {}
+fn Max(x:double, y:double) double {}
+fn Min(x:double, y:double) double {}
+fn Mod(x:double, y:double) double {}
+fn Modf(f double {}) (int double {}, frac double {})
+fn NaN() double {}
+fn Nextafter(x:double, y:double) (r double {})
+fn Nextafter32(x:double, y float32) (r float32)
+fn Pow(x:double, y:double) double {}
+fn Pow10(n int) double {}
+fn Remainder(x:double, y:double) double {}
+fn Round(x:double) double {}
+fn RoundToEven(x:double) double {}
+fn Signbit(x:double) bool
+fn Sin(x:double) double {}
+fn Sincos(x:double) (sin, cos double {})
+fn Sinh(x:double) double {}
+fn Sqrt(x:double) double {}
+fn Tan(x:double) double {}
+fn Tanh(x:double) double {}
+fn Trunc(x:double) double {}
+fn Y0(x:double) double {}
+fn Y1(x:double) double {}
+fn Yn(n int, x:double) double {}

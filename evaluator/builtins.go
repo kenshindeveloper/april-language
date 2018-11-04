@@ -1,14 +1,39 @@
 package evaluator
 
 import (
+	"bufio"
 	"fmt"
-	"io"
 	"io/ioutil"
+	"math"
 	"os"
 	"strconv"
+	"strings"
+	"time"
 
 	"github.com/kenshindeveloper/april/object"
 )
+
+func getFormat(str string) string {
+	final := str
+	for _, char := range []string{"n", "r", "t", "a"} {
+		if strings.Contains(final, "\\"+char) {
+			l := strings.Split(final, "\\"+char)
+			switch char {
+			case "a":
+				final = strings.Join(l, "\a") // Attempts to alert the user through audible or visible notification.
+			case "n":
+				final = strings.Join(l, "\n") // Moves the printing position to the start of the next line.
+			case "r":
+				final = strings.Join(l, "\r") // Moves the printing position to the start of the current line.
+			case "t":
+				final = strings.Join(l, "\t") // Moves the printing position to the next tab position on the current line. If there are no more tab positions left on the line, the behaviour is undefined.
+
+			}
+		}
+	}
+
+	return final
+}
 
 var builtins = map[string]*object.Builtin{
 	"len": &object.Builtin{
@@ -341,15 +366,19 @@ var builtins = map[string]*object.Builtin{
 	"print": &object.Builtin{
 		Fn: func(args ...object.Object) object.Object {
 			for _, arg := range args {
-				fmt.Println(arg.Inspect())
+				fmt.Println(getFormat(arg.Inspect()))
 			}
 			return NIL
 		},
 	},
 	"printf": &object.Builtin{
 		Fn: func(args ...object.Object) object.Object {
-			str := args[0].Inspect()[1 : len(args[0].Inspect())-1]
-			fmt.Printf(str)
+			if len(args) != 1 {
+				return newError("wrong number of arguments. got'%d', want='1'", len(args))
+			}
+
+			str := args[0].Inspect()
+			fmt.Printf(getFormat(str) + "\n")
 			return NIL
 		},
 	},
@@ -385,6 +414,48 @@ var builtins = map[string]*object.Builtin{
 			return &object.Stream{FILE: file}
 		},
 	},
+
+	"isExist": &object.Builtin{
+		Fn: func(args ...object.Object) object.Object {
+			if len(args) != 1 {
+				return newError("wrong number of arguments. got'%d', want='1'", len(args))
+			}
+
+			path, ok := args[0].(*object.String)
+			if !ok {
+				return newError("argument is not type stream.")
+			}
+
+			_, err := os.Stat(path.Value)
+			if err != nil {
+				if os.IsNotExist(err) {
+					return FALSE
+				}
+			}
+
+			return TRUE
+		},
+	},
+
+	"isOpen": &object.Builtin{
+		Fn: func(args ...object.Object) object.Object {
+			if len(args) != 1 {
+				return newError("wrong number of arguments. got'%d', want='1'", len(args))
+			}
+
+			stream, ok := args[0].(*object.Stream)
+			if !ok {
+				return newError("argument is not type stream.")
+			}
+
+			if stream.FILE == nil {
+				return FALSE
+			}
+
+			return TRUE
+		},
+	},
+
 	"create": &object.Builtin{
 		Fn: func(args ...object.Object) object.Object {
 			if len(args) != 1 {
@@ -404,6 +475,56 @@ var builtins = map[string]*object.Builtin{
 			return &object.Stream{FILE: file}
 		},
 	},
+	"rename": &object.Builtin{
+		Fn: func(args ...object.Object) object.Object {
+			if len(args) != 2 {
+				return newError("wrong number of arguments. got'%d', want='1'", len(args))
+			}
+
+			originalName, ok := args[0].(*object.String)
+			if !ok {
+				return newError("argument is not type string.")
+			}
+
+			newName, ok := args[0].(*object.String)
+			if !ok {
+				return newError("argument is not type string.")
+			}
+
+			err := os.Rename(originalName.Value, newName.Value)
+			if err != nil {
+				return newError("file could not be renamed")
+			}
+
+			return TRUE
+		},
+	},
+
+	"move": &object.Builtin{
+		Fn: func(args ...object.Object) object.Object {
+			if len(args) != 2 {
+				return newError("wrong number of arguments. got'%d', want='1'", len(args))
+			}
+
+			originalPath, ok := args[0].(*object.String)
+			if !ok {
+				return newError("argument is not type string.")
+			}
+
+			newPath, ok := args[0].(*object.String)
+			if !ok {
+				return newError("argument is not type string.")
+			}
+
+			err := os.Rename(originalPath.Value, newPath.Value)
+			if err != nil {
+				return newError("file could not be renamed")
+			}
+
+			return TRUE
+		},
+	},
+
 	"write": &object.Builtin{
 		Fn: func(args ...object.Object) object.Object {
 			if len(args) != 2 {
@@ -419,19 +540,20 @@ var builtins = map[string]*object.Builtin{
 			if !ok {
 				return newError("second argument is not type string.")
 			}
+			str.Value = getFormat(str.Value)
 
 			if stream.FILE == nil {
 				return newError("variable file is equal to null.")
 			}
 
-			// w := bufio.NewWriter(stream.FILE)
-			// w.WriteString(fmt.Sprintf(str.Value))
-			// w.Flush()
-			io.WriteString(stream.FILE, str.Value)
+			w := bufio.NewWriter(stream.FILE)
+			w.WriteString(str.Value)
+			w.Flush()
 
 			return NIL
 		},
 	},
+
 	"read": &object.Builtin{
 		Fn: func(args ...object.Object) object.Object {
 			if len(args) != 1 {
@@ -452,9 +574,10 @@ var builtins = map[string]*object.Builtin{
 				return newError("error to read file.")
 			}
 
-			return &object.String{Value: string(data)}
+			return &object.String{Value: getFormat(string(data))}
 		},
 	},
+
 	"close": &object.Builtin{
 		Fn: func(args ...object.Object) object.Object {
 			if len(args) != 1 {
@@ -472,6 +595,266 @@ var builtins = map[string]*object.Builtin{
 
 			stream.FILE.Close()
 			stream.FILE = nil
+			return NIL
+		},
+	},
+
+	"remove": &object.Builtin{
+		Fn: func(args ...object.Object) object.Object {
+			if len(args) != 1 {
+				return newError("wrong number of arguments. got'%d', want='1'", len(args))
+			}
+
+			str, ok := args[0].(*object.String)
+			if !ok {
+				return newError("argument is not type string.")
+			}
+
+			err := os.Remove(str.Value)
+			if err != nil {
+				return newError("file could not be deleted.")
+			}
+
+			return TRUE
+		},
+	},
+	//***************************************************************************************
+	//***************************************************************************************
+	//***************************************************************************************
+	"GoCeil": &object.Builtin{
+		Fn: func(args ...object.Object) object.Object {
+			if len(args) != 1 {
+				return newError("wrong number of arguments. got'%d', want='1'", len(args))
+			}
+
+			x, ok := args[0].(*object.Double)
+			if !ok {
+				return newError("argument is not type Double.")
+			}
+
+			return &object.Double{Value: math.Ceil(x.Value)}
+		},
+	},
+
+	"GoFoor": &object.Builtin{
+		Fn: func(args ...object.Object) object.Object {
+			if len(args) != 1 {
+				return newError("wrong number of arguments. got'%d', want='1'", len(args))
+			}
+
+			x, ok := args[0].(*object.Double)
+			if !ok {
+				return newError("argument is not type Double.")
+			}
+
+			return &object.Double{Value: math.Floor(x.Value)}
+		},
+	},
+
+	"GoLog": &object.Builtin{
+		Fn: func(args ...object.Object) object.Object {
+			if len(args) != 1 {
+				return newError("wrong number of arguments. got'%d', want='1'", len(args))
+			}
+
+			x, ok := args[0].(*object.Double)
+			if !ok {
+				return newError("argument is not type Double.")
+			}
+
+			return &object.Double{Value: math.Log(x.Value)}
+		},
+	},
+
+	"GoLog10": &object.Builtin{
+		Fn: func(args ...object.Object) object.Object {
+			if len(args) != 1 {
+				return newError("wrong number of arguments. got'%d', want='1'", len(args))
+			}
+
+			x, ok := args[0].(*object.Double)
+			if !ok {
+				return newError("argument is not type Double.")
+			}
+
+			return &object.Double{Value: math.Log10(x.Value)}
+		},
+	},
+
+	"GoPow": &object.Builtin{
+		Fn: func(args ...object.Object) object.Object {
+			if len(args) != 2 {
+				return newError("wrong number of arguments. got'%d', want='1'", len(args))
+			}
+
+			x, ok := args[0].(*object.Double)
+			if !ok {
+				return newError("argument is not type Double.")
+			}
+
+			y, ok := args[0].(*object.Double)
+			if !ok {
+				return newError("argument is not type Double.")
+			}
+
+			return &object.Double{Value: math.Pow(x.Value, y.Value)}
+		},
+	},
+
+	"GoPow10": &object.Builtin{
+		Fn: func(args ...object.Object) object.Object {
+			if len(args) != 1 {
+				return newError("wrong number of arguments. got'%d', want='1'", len(args))
+			}
+
+			x, ok := args[0].(*object.Integer)
+			if !ok {
+				return newError("argument is not type Double.")
+			}
+
+			return &object.Double{Value: math.Pow10(int(x.Value))}
+		},
+	},
+
+	"GoRound": &object.Builtin{
+		Fn: func(args ...object.Object) object.Object {
+			if len(args) != 1 {
+				return newError("wrong number of arguments. got'%d', want='1'", len(args))
+			}
+
+			x, ok := args[0].(*object.Double)
+			if !ok {
+				return newError("argument is not type Double.")
+			}
+
+			return &object.Double{Value: math.Round(x.Value)}
+		},
+	},
+
+	"GoTrunc": &object.Builtin{
+		Fn: func(args ...object.Object) object.Object {
+			if len(args) != 1 {
+				return newError("wrong number of arguments. got'%d', want='1'", len(args))
+			}
+
+			x, ok := args[0].(*object.Double)
+			if !ok {
+				return newError("argument is not type Double.")
+			}
+
+			return &object.Double{Value: math.Trunc(x.Value)}
+		},
+	},
+
+	"GoMax": &object.Builtin{
+		Fn: func(args ...object.Object) object.Object {
+			if len(args) != 2 {
+				return newError("wrong number of arguments. got'%d', want='1'", len(args))
+			}
+
+			x1, ok1 := args[0].(*object.Integer)
+			y1, ok2 := args[1].(*object.Integer)
+			if ok1 {
+				if !ok2 {
+					return newError("argument is not type Integer.")
+				} else {
+					return &object.Double{Value: math.Max(float64(x1.Value), float64(y1.Value))}
+				}
+			}
+
+			x2, ok1 := args[0].(*object.Double)
+			y2, ok2 := args[1].(*object.Double)
+			if ok1 {
+				if !ok2 {
+					return newError("argument is not type Integer o Double.")
+				} else {
+					return &object.Double{Value: math.Max(x2.Value, y2.Value)}
+				}
+			} else {
+				return newError("argument is not type Integer o Double.")
+			}
+		},
+	},
+
+	"GoMin": &object.Builtin{
+		Fn: func(args ...object.Object) object.Object {
+			if len(args) != 2 {
+				return newError("wrong number of arguments. got'%d', want='1'", len(args))
+			}
+
+			x1, ok1 := args[0].(*object.Integer)
+			y1, ok2 := args[1].(*object.Integer)
+			if ok1 {
+				if !ok2 {
+					return newError("argument is not type Integer.")
+				} else {
+					return &object.Double{Value: math.Max(float64(x1.Value), float64(y1.Value))}
+				}
+			}
+
+			x2, ok1 := args[0].(*object.Double)
+			y2, ok2 := args[1].(*object.Double)
+			if ok1 {
+				if !ok2 {
+					return newError("argument is not type Integer o Double.")
+				} else {
+					return &object.Double{Value: math.Min(x2.Value, y2.Value)}
+				}
+			} else {
+				return newError("argument is not type Integer o Double.")
+			}
+		},
+	},
+	//***************************************************************************************
+	//***************************************************************************************
+	//***************************************************************************************
+	"GoNow": &object.Builtin{
+		Fn: func(args ...object.Object) object.Object {
+			if len(args) != 0 {
+				return newError("wrong number of arguments. got'%d', want='1'", len(args))
+			}
+
+			now := time.Now()
+			println(now.String())
+			return NIL
+		},
+	},
+
+	"GoYear": &object.Builtin{
+		Fn: func(args ...object.Object) object.Object {
+			if len(args) != 0 {
+				return newError("wrong number of arguments. got'%d', want='1'", len(args))
+			}
+
+			now := time.Now()
+			Year := now.Year()
+			fmt.Printf("%v", Year)
+			return NIL
+		},
+	},
+
+	"GoMonth": &object.Builtin{
+		Fn: func(args ...object.Object) object.Object {
+			if len(args) != 0 {
+				return newError("wrong number of arguments. got'%d', want='1'", len(args))
+			}
+
+			now := time.Now()
+			month := now.Month()
+			fmt.Printf("%v", month)
+			return NIL
+		},
+	},
+
+	"GoDay": &object.Builtin{
+		Fn: func(args ...object.Object) object.Object {
+			if len(args) != 0 {
+				return newError("wrong number of arguments. got'%d', want='1'", len(args))
+			}
+
+			now := time.Now()
+			day := now.Day()
+			fmt.Printf("%v", day)
 			return NIL
 		},
 	},

@@ -35,8 +35,7 @@ func Start(w io.Writer, r io.Reader, version string) {
 		log.Fatal("problema al leer la informacion del usuario.")
 	}
 	cleanConsole()
-	fmt.Printf("Hello %s! This is the April programming language version %s!\n", info.Name, version)
-	fmt.Printf("Feel free to type in commands.\n")
+	fmt.Printf("Hello %s! This is the April programming language version %s!\nDeveloped for Pandicorn & Kenshin Urashima.\n\n", info.Name, version)
 	env := object.NewEnvironment()
 	stackBlock := libs.NewStack()
 	inputBlock := ""

@@ -1,18 +1,27 @@
 // **********************************************************
 // **                                                     ***
 // **    Programado por Pandicorn & Kenshin Urashima      ***
-// **    Test: fibonacci en April                         ***
+// **    Test: listas en April							  ***
 // **                                                     ***
 // **********************************************************
 
-fn fibonacci(valor:int) double {
-    if (valor < 3) { 
-		if (valor <= 0) { return 0; } 
-		else { return 1; } 
-	} 
-    else { return fibonacci(valor-1) +  fibonacci(valor-2); }
+var x:list = [0, 2, 3, [5, 6]];
+var z:list = [9, 8, 7];
+
+i := 0;
+for (i < len(x))
+{
+    if (i != 3)
+    {
+        print(x[i]);
+    } 
+    i += 1;
 }
 
-x := 20;
-result := fibonacci(x);
-print("result: "+str(result));
+print(" ");
+i = 0;
+for (i < len(z))
+{
+    print(z[i]);
+    i += 1;
+}

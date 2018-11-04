@@ -1,18 +1,26 @@
 // **********************************************************
 // **                                                     ***
 // **    Programado por Pandicorn & Kenshin Urashima      ***
-// **    Test: fibonacci en April                         ***
+// **    Test: array string en April                      ***
 // **                                                     ***
 // **********************************************************
 
-fn fibonacci(valor:int) double {
-    if (valor < 3) { 
-		if (valor <= 0) { return 0; } 
-		else { return 1; } 
-	} 
-    else { return fibonacci(valor-1) +  fibonacci(valor-2); }
+fn foo()
+{
+
+    x := "PANDICORNIO";
+    i:= 0;
+    y := "";
+    //len(x[0]);
+    print(len(x));
+    print(len(y));
+
+    for (i < len(x))
+    {
+        print(x[i]);
+        i=i+1;
+    }
+
 }
 
-x := 20;
-result := fibonacci(x);
-print("result: "+str(result));
+foo();
